@@ -192,32 +192,6 @@ dart run bin/feature_gen.dart generate auth
 dart test
 ```
 
-### Project structure
-
-```
-feature_gen/
-├── bin/
-│   └── feature_gen.dart          # CLI entrypoint
-├── lib/
-│   └── src/
-│       ├── commands/
-│       │   └── generate_command.dart
-│       ├── generators/
-│       │   ├── feature_generator.dart
-│       │   ├── data_generator.dart
-│       │   ├── domain_generator.dart
-│       │   └── presentation_generator.dart
-│       ├── templates/
-│       │   ├── data_templates.dart
-│       │   ├── domain_templates.dart
-│       │   └── presentation_templates.dart
-│       ├── utils/
-│       │   └── process_runner.dart
-│       └── config/
-│           └── config_loader.dart
-└── test/
-```
-
 ### Dependencies
 
 | Package | Purpose |
@@ -226,6 +200,7 @@ feature_gen/
 | [`mason_logger`](https://pub.dev/packages/mason_logger) | Formatted terminal output with spinners and colours |
 | [`yaml`](https://pub.dev/packages/yaml) | Parsing `feature_gen.yaml` and `pubspec.yaml` |
 | [`path`](https://pub.dev/packages/path) | Cross-platform path operations |
+| [`recase`](https://pub.dev/packages/recase) | Map between several coding styles |
 
 ---
 
