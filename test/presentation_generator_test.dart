@@ -1,0 +1,129 @@
+import 'package:feature_gen/src/generators/presentation_generator.dart';
+import 'package:file/file.dart';
+import 'package:test/test.dart';
+import 'package:file/memory.dart';
+
+void main() {
+  group(PresentationGenerator, () {
+    late FileSystem fileSystem;
+    late PresentationGenerator generator;
+
+    setUp(() {
+      fileSystem = MemoryFileSystem.test();
+      generator = PresentationGenerator(
+        featureName: 'counter',
+        basePath: 'lib/features',
+        fileSystem: fileSystem,
+      );
+    });
+
+    test('should generate domain directory', () async {
+      await generator.generate();
+
+      expect(
+        fileSystem
+            .file('lib/features/counter/presentation/counter_screen.dart')
+            .readAsString(),
+        completion(
+          equals(
+            '''
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'bloc/counter_bloc.dart';
+
+class CounterScreen extends StatelessWidget {
+  const CounterScreen({super.key});
+
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => CounterBloc()..add(const CounterEvent.onSetup()),
+      child: BlocBuilder<CounterBloc, CounterState>(
+        builder: (context, state) {
+          return _Scaffold(state: state);
+        }
+      ),
+    );
+  }
+}
+
+class _Scaffold extends StatelessWidget {
+  const _Scaffold({required this.state});
+
+  final CounterState state;
+
+  Widget build(BuildContext state) {
+    return const Placeholder();
+  }
+}
+''',
+          ),
+        ),
+      );
+
+      expect(
+        fileSystem
+            .file('lib/features/counter/presentation/bloc/counter_bloc.dart')
+            .readAsString(),
+        completion(
+          equals('''
+import 'dart:async';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freezed/freezed.dart';
+
+part 'counter_bloc.freezed.dart';
+part 'counter_event.dart';
+part 'counter_state.dart';
+
+class CounterBloc extends Bloc<CounterEvent, CounterState> {
+  CounterBloc() : super(CounterState.initial()) {
+    on<_OnSetup>(_onSetup);
+  }
+
+  FutureOr<void> _onSetup(_OnSetup event, Emitter<CounterState> emit) {
+    // TODO: Implement
+  }
+}
+'''),
+        ),
+      );
+
+      expect(
+        fileSystem
+            .file('lib/features/counter/presentation/bloc/counter_event.dart')
+            .readAsString(),
+        completion(
+          equals('''
+part of 'counter_bloc.dart';
+
+@freezed
+sealed class CounterEvent with _\$CounterEvent {
+  const factory CounterEvent.onSetup() = _OnSetup;
+}
+'''),
+        ),
+      );
+
+      expect(
+        fileSystem
+            .file('lib/features/counter/presentation/bloc/counter_state.dart')
+            .readAsString(),
+        completion(
+          equals('''
+part of 'counter_bloc.dart';
+
+@freezed
+sealed class CounterState with _\$CounterState {
+  const factory CounterState() = _CounterState;
+
+  factory CounterState.initial() {
+    return const CounterState();
+  }
+}
+'''),
+        ),
+      );
+    });
+  });
+}
