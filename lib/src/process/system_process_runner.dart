@@ -1,12 +1,12 @@
 import 'dart:io';
+import 'package:feature_gen/src/process/process_runner.dart';
 import 'package:file/file.dart';
 import 'package:path/path.dart' as path;
-import 'package:yaml/yaml.dart';
 
 import 'package:mason_logger/mason_logger.dart';
 
-class ProcessRunner {
-  const ProcessRunner({
+class SystemProcessRunner implements ProcessRunner {
+  const SystemProcessRunner({
     required this.logger,
     required this.workingDirectory,
     required this.fileSystem,
@@ -16,14 +16,19 @@ class ProcessRunner {
   final String workingDirectory;
   final FileSystem fileSystem;
 
+  @override
   Future<void> runBuildRunner(String featurePath) async {
     final progress = logger.progress('Running build_runner ...');
+    if (!await _hasBuildRunner()) {
+      progress.fail(
+        'Could not run build_runner due to missing dependency in project. Make sure your pubspec.yaml file contains the build_runner dependency.',
+      );
+
+      return;
+    }
 
     try {
-      final packageName = await _readPackageName();
-
-      // featurePath might be "lib/features/auth" → "myapp|lib/features/auth/**"
-      final buildFilter = '$packageName|$featurePath/**';
+      final buildFilter = '$featurePath/**';
 
       final result = await Process.run(
         'dart',
@@ -31,7 +36,7 @@ class ProcessRunner {
           'run',
           'build_runner',
           'build',
-          // '--build-filter=$buildFilter',
+          '--build-filter=$buildFilter',
           '--delete-conflicting-outputs',
         ],
         workingDirectory: workingDirectory,
@@ -48,6 +53,7 @@ class ProcessRunner {
     }
   }
 
+  @override
   Future<void> runDartFormat(String featurePath) async {
     final progress = logger.progress('Running dart format...');
 
@@ -69,21 +75,16 @@ class ProcessRunner {
     }
   }
 
-  Future<String> _readPackageName() async {
+  Future<bool> _hasBuildRunner() async {
     final pubspecFile = fileSystem.file(
       path.join(workingDirectory, 'pubspec.yaml'),
     );
 
     if (!await pubspecFile.exists()) {
-      throw Exception('pubspec.yaml not found in $workingDirectory');
+      return false;
     }
 
     final content = await pubspecFile.readAsString();
-    final yaml = loadYaml(content) as Map;
-    final name = yaml['name'] as String?;
-
-    if (name == null)
-      throw Exception('Could not read package name from pubspec.yaml');
-    return name;
+    return content.contains('build_runner');
   }
 }

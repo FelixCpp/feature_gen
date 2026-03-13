@@ -4,17 +4,17 @@ import 'package:path/path.dart' as path;
 
 class DomainGenerator {
   final String featureName;
-  final String basePath;
+  final String outputDirectory;
   final FileSystem fileSystem;
 
   const DomainGenerator({
     required this.featureName,
-    required this.basePath,
+    required this.outputDirectory,
     required this.fileSystem,
   });
 
   Future<void> generate() async {
-    final featurePath = path.join(basePath, featureName, 'domain');
+    final featurePath = path.join(outputDirectory, featureName, 'domain');
 
     await _createFile(
       path.join(

@@ -12,7 +12,7 @@ void main() {
       fileSystem = MemoryFileSystem.test();
       generator = DataGenerator(
         featureName: 'counter',
-        basePath: 'lib/features',
+        outputDirectory: 'lib/features',
         fileSystem: fileSystem,
       );
     });

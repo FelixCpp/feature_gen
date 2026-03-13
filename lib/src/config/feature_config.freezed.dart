@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$FeatureGenConfig {
 
- String get basePath; bool get format; bool get buildRunner;
+ String get outputDirectory; bool get format; bool get buildRunner;
 /// Create a copy of FeatureGenConfig
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $FeatureGenConfigCopyWith<FeatureGenConfig> get copyWith => _$FeatureGenConfigCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FeatureGenConfig&&(identical(other.basePath, basePath) || other.basePath == basePath)&&(identical(other.format, format) || other.format == format)&&(identical(other.buildRunner, buildRunner) || other.buildRunner == buildRunner));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FeatureGenConfig&&(identical(other.outputDirectory, outputDirectory) || other.outputDirectory == outputDirectory)&&(identical(other.format, format) || other.format == format)&&(identical(other.buildRunner, buildRunner) || other.buildRunner == buildRunner));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,basePath,format,buildRunner);
+int get hashCode => Object.hash(runtimeType,outputDirectory,format,buildRunner);
 
 @override
 String toString() {
-  return 'FeatureGenConfig(basePath: $basePath, format: $format, buildRunner: $buildRunner)';
+  return 'FeatureGenConfig(outputDirectory: $outputDirectory, format: $format, buildRunner: $buildRunner)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $FeatureGenConfigCopyWith<$Res>  {
   factory $FeatureGenConfigCopyWith(FeatureGenConfig value, $Res Function(FeatureGenConfig) _then) = _$FeatureGenConfigCopyWithImpl;
 @useResult
 $Res call({
- String basePath, bool format, bool buildRunner
+ String outputDirectory, bool format, bool buildRunner
 });
 
 
@@ -62,9 +62,9 @@ class _$FeatureGenConfigCopyWithImpl<$Res>
 
 /// Create a copy of FeatureGenConfig
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? basePath = null,Object? format = null,Object? buildRunner = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? outputDirectory = null,Object? format = null,Object? buildRunner = null,}) {
   return _then(_self.copyWith(
-basePath: null == basePath ? _self.basePath : basePath // ignore: cast_nullable_to_non_nullable
+outputDirectory: null == outputDirectory ? _self.outputDirectory : outputDirectory // ignore: cast_nullable_to_non_nullable
 as String,format: null == format ? _self.format : format // ignore: cast_nullable_to_non_nullable
 as bool,buildRunner: null == buildRunner ? _self.buildRunner : buildRunner // ignore: cast_nullable_to_non_nullable
 as bool,
@@ -149,10 +149,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String basePath,  bool format,  bool buildRunner)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String outputDirectory,  bool format,  bool buildRunner)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FeatureGenConfig() when $default != null:
-return $default(_that.basePath,_that.format,_that.buildRunner);case _:
+return $default(_that.outputDirectory,_that.format,_that.buildRunner);case _:
   return orElse();
 
 }
@@ -170,10 +170,10 @@ return $default(_that.basePath,_that.format,_that.buildRunner);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String basePath,  bool format,  bool buildRunner)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String outputDirectory,  bool format,  bool buildRunner)  $default,) {final _that = this;
 switch (_that) {
 case _FeatureGenConfig():
-return $default(_that.basePath,_that.format,_that.buildRunner);}
+return $default(_that.outputDirectory,_that.format,_that.buildRunner);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -187,10 +187,10 @@ return $default(_that.basePath,_that.format,_that.buildRunner);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String basePath,  bool format,  bool buildRunner)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String outputDirectory,  bool format,  bool buildRunner)?  $default,) {final _that = this;
 switch (_that) {
 case _FeatureGenConfig() when $default != null:
-return $default(_that.basePath,_that.format,_that.buildRunner);case _:
+return $default(_that.outputDirectory,_that.format,_that.buildRunner);case _:
   return null;
 
 }
@@ -202,10 +202,10 @@ return $default(_that.basePath,_that.format,_that.buildRunner);case _:
 
 
 class _FeatureGenConfig implements FeatureGenConfig {
-  const _FeatureGenConfig({required this.basePath, required this.format, required this.buildRunner});
+  const _FeatureGenConfig({required this.outputDirectory, required this.format, required this.buildRunner});
   
 
-@override final  String basePath;
+@override final  String outputDirectory;
 @override final  bool format;
 @override final  bool buildRunner;
 
@@ -219,16 +219,16 @@ _$FeatureGenConfigCopyWith<_FeatureGenConfig> get copyWith => __$FeatureGenConfi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FeatureGenConfig&&(identical(other.basePath, basePath) || other.basePath == basePath)&&(identical(other.format, format) || other.format == format)&&(identical(other.buildRunner, buildRunner) || other.buildRunner == buildRunner));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FeatureGenConfig&&(identical(other.outputDirectory, outputDirectory) || other.outputDirectory == outputDirectory)&&(identical(other.format, format) || other.format == format)&&(identical(other.buildRunner, buildRunner) || other.buildRunner == buildRunner));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,basePath,format,buildRunner);
+int get hashCode => Object.hash(runtimeType,outputDirectory,format,buildRunner);
 
 @override
 String toString() {
-  return 'FeatureGenConfig(basePath: $basePath, format: $format, buildRunner: $buildRunner)';
+  return 'FeatureGenConfig(outputDirectory: $outputDirectory, format: $format, buildRunner: $buildRunner)';
 }
 
 
@@ -239,7 +239,7 @@ abstract mixin class _$FeatureGenConfigCopyWith<$Res> implements $FeatureGenConf
   factory _$FeatureGenConfigCopyWith(_FeatureGenConfig value, $Res Function(_FeatureGenConfig) _then) = __$FeatureGenConfigCopyWithImpl;
 @override @useResult
 $Res call({
- String basePath, bool format, bool buildRunner
+ String outputDirectory, bool format, bool buildRunner
 });
 
 
@@ -256,9 +256,9 @@ class __$FeatureGenConfigCopyWithImpl<$Res>
 
 /// Create a copy of FeatureGenConfig
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? basePath = null,Object? format = null,Object? buildRunner = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? outputDirectory = null,Object? format = null,Object? buildRunner = null,}) {
   return _then(_FeatureGenConfig(
-basePath: null == basePath ? _self.basePath : basePath // ignore: cast_nullable_to_non_nullable
+outputDirectory: null == outputDirectory ? _self.outputDirectory : outputDirectory // ignore: cast_nullable_to_non_nullable
 as String,format: null == format ? _self.format : format // ignore: cast_nullable_to_non_nullable
 as bool,buildRunner: null == buildRunner ? _self.buildRunner : buildRunner // ignore: cast_nullable_to_non_nullable
 as bool,

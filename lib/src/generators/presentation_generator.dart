@@ -4,17 +4,17 @@ import 'package:path/path.dart' as path;
 
 class PresentationGenerator {
   final String featureName;
-  final String basePath;
+  final String outputDirectory;
   final FileSystem fileSystem;
 
   const PresentationGenerator({
     required this.featureName,
-    required this.basePath,
+    required this.outputDirectory,
     required this.fileSystem,
   });
 
   Future<void> generate() async {
-    final featurePath = path.join(basePath, featureName, 'presentation');
+    final featurePath = path.join(outputDirectory, featureName, 'presentation');
 
     await _createFile(
       path.join(featurePath, '${featureName}_screen.dart'),
