@@ -3,6 +3,11 @@ description: A generate tool for features inside your flutter app.
 version: 1.0.0
 publish_to: https://pub.dev
 repository: https://github.com/FelixCpp/feature_gen
+issue_tracker: https://github.com/<user>/<repository>/issues
+topics:
+  - code-generation
+  - cli
+  - dart
 
 environment:
   sdk: ^3.0.0
