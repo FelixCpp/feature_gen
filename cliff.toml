@@ -16,7 +16,7 @@ body = """
 {% for group, commits in commits | group_by(attribute="group") %}
 ### {{ group | upper_first }}
 {% for commit in commits %}
-- {% if commit.breaking %}[**breaking**] {% endif %}{{ commit.message | upper_first }} ([`{{ commit.id | truncate(length=7, end="") }}`]({{ commit.id }}))
+- {% if commit.breaking %}[**breaking**] {% endif %}{{ commit.message | split(pat="\n") | first | upper_first }} ([`{{ commit.id | truncate(length=7, end="") }}`]({{ commit.id }}))
 {%- endfor %}
 {% endfor %}\n
 """
@@ -27,25 +27,26 @@ footer = """
 trim = true
 
 [git]
-conventional_commits = true
-filter_unconventional = true
+conventional_commits = false
+filter_unconventional = false
 split_commits = false
 
 commit_parsers = [
-  { message = "^feat",              group = "Features"      },
-  { message = "^fix",               group = "Bug Fixes"     },
-  { message = "^perf",              group = "Performance"   },
-  { message = "^refactor",          group = "Refactoring"   },
-  { message = "^docs",              group = "Documentation" },
-  { message = "^test",              group = "Testing"       },
-  { message = "^chore\\(release\\)", skip = true            },
-  { message = "^chore",             group = "Miscellaneous" },
-  { message = "^ci",                skip = true             },
-  { message = "^style",             skip = true             },
-  { body = ".*security",            group = "Security"      },
+  { message = "^feat",               group = "Features"      },
+  { message = "^fix",                group = "Bug Fixes"     },
+  { message = "^perf",               group = "Performance"   },
+  { message = "^refactor",           group = "Refactoring"   },
+  { message = "^docs",               group = "Documentation" },
+  { message = "^test",               group = "Testing"       },
+  { message = "^chore\\(release\\)", skip = true             },
+  { message = "^chore",              group = "Miscellaneous" },
+  { message = "^ci",                 skip = true             },
+  { message = "^style",              skip = true             },
+  { body = ".*security",             group = "Security"      },
+  { message = ".*",                  group = "Other"         },
 ]
 
-filter_commits = true
+filter_commits = false
 tag_pattern = "v[0-9]*"
 ignore_tags = "alpha|beta|rc"
 topo_order = false
