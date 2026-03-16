@@ -50,7 +50,3 @@ tag_pattern = "v[0-9]*"
 ignore_tags = "alpha|beta|rc"
 topo_order = false
 sort_commits = "oldest"
-
-[remote.github]
-owner = "dein-name"
-repo = "feature_gen"
