@@ -1,4 +1,4 @@
-# feature_gen
+# dart_feature_gen
 
 A Dart CLI tool that generates clean, consistent feature structures for Flutter apps following clean architecture principles — including automatic `dart format` and optional `build_runner` execution.
 
@@ -22,13 +22,13 @@ A Dart CLI tool that generates clean, consistent feature structures for Flutter 
 
 In larger Flutter projects, every feature tends to follow the same folder structure: a `data` layer, a `domain` layer, and a `presentation` layer. Creating this by hand is repetitive and error-prone.
 
-`feature_gen` automates this entirely. One command creates the full directory tree, populates every file with the correct boilerplate, formats the output with `dart format`, and optionally triggers `build_runner` to generate Freezed classes and other code-gen output — scoped only to the new feature to keep build times short.
+`dart_feature_gen` automates this entirely. One command creates the full directory tree, populates every file with the correct boilerplate, formats the output with `dart format`, and optionally triggers `build_runner` to generate Freezed classes and other code-gen output — scoped only to the new feature to keep build times short.
 
 ---
 
 ## Generated Structure
 
-Running `feature_gen generate auth` inside your Flutter project root produces:
+Running `dart_feature_gen generate auth` inside your Flutter project root produces:
 
 ```
 lib/features/auth/
@@ -63,7 +63,7 @@ Each file is pre-populated with the correct class name (derived from the feature
 ### Option A: Global activation (recommended)
 
 ```bash
-dart pub global activate feature_gen
+dart pub global activate dart_feature_gen
 ```
 
 Make sure your Dart pub cache is on your PATH. Add the following to your shell config (`.zshrc`, `.bashrc`, etc.) if it isn't already:
@@ -75,15 +75,15 @@ export PATH="$PATH:$HOME/.pub-cache/bin"
 ### Option B: From source
 
 ```bash
-git clone https://github.com/yourname/feature_gen.git
-cd feature_gen
+git clone https://github.com/yourname/dart_feature_gen.git
+cd dart_feature_gen
 dart pub global activate --source path .
 ```
 
 ### Option C: Run without installing
 
 ```bash
-dart run bin/feature_gen.dart generate auth
+dart run bin/dart_feature_gen.dart generate auth
 ```
 
 ---
@@ -94,28 +94,28 @@ dart run bin/feature_gen.dart generate auth
 
 ```bash
 # Generate a feature named "auth" under lib/features/
-feature_gen generate auth
+dart_feature_gen generate auth
 ```
 
 ### Custom output directory
 
 ```bash
 # Generate under a different directory
-feature_gen generate auth --output-dir lib/src/features
+dart_feature_gen generate auth --output-dir lib/src/features
 ```
 
 ### Directory prefix
 
 ```bash
 # Generate using a prefix. Output: lib/src/features/feat_auth/...
-feature_gen generate auth --feature-prefix feat --output-dir lib/src/features
+dart_feature_gen generate auth --feature-prefix feat --output-dir lib/src/features
 ```
 
 ### Skip build_runner
 
 ```bash
 # Only generate files and run dart format — skip build_runner
-feature_gen generate auth --no-build
+dart_feature_gen generate auth --no-build
 ```
 
 ### Multi-word feature names
@@ -123,7 +123,7 @@ feature_gen generate auth --no-build
 Use `snake_case` — class names are automatically converted to `PascalCase`:
 
 ```bash
-feature_gen generate user_profile
+dart_feature_gen generate user_profile
 # → UserProfileBloc, UserProfileRepository, etc.
 ```
 
@@ -131,10 +131,10 @@ feature_gen generate user_profile
 
 ## Configuration
 
-Place a `feature_gen.yaml` file in your Flutter project root to set defaults:
+Place a `dart_feature_gen.yaml` file in your Flutter project root to set defaults:
 
 ```yaml
-# feature_gen.yaml
+# dart_feature_gen.yaml
 
 # Base path for generated features (default: lib/features)
 output-dir: lib/features
@@ -151,7 +151,7 @@ format: true
 build_runner: true
 ```
 
-CLI flags always take precedence over `feature_gen.yaml` values.
+CLI flags always take precedence over `dart_feature_gen.yaml` values.
 
 ---
 
@@ -192,10 +192,10 @@ CLI flags always take precedence over `feature_gen.yaml` values.
 ### Running locally
 
 ```bash
-git clone https://github.com/yourname/feature_gen.git
-cd feature_gen
+git clone https://github.com/yourname/dart_feature_gen.git
+cd dart_feature_gen
 dart pub get
-dart run bin/feature_gen.dart generate auth
+dart run bin/dart_feature_gen.dart generate auth
 ```
 
 ### Running tests
@@ -210,7 +210,7 @@ dart test
 |---|---|
 | [`args`](https://pub.dev/packages/args) | CLI argument and flag parsing |
 | [`mason_logger`](https://pub.dev/packages/mason_logger) | Formatted terminal output with spinners and colours |
-| [`yaml`](https://pub.dev/packages/yaml) | Parsing `feature_gen.yaml` and `pubspec.yaml` |
+| [`yaml`](https://pub.dev/packages/yaml) | Parsing `dart_feature_gen.yaml` and `pubspec.yaml` |
 | [`path`](https://pub.dev/packages/path) | Cross-platform path operations |
 | [`recase`](https://pub.dev/packages/recase) | Map between several coding styles |
 

@@ -1,5 +1,5 @@
-import 'package:feature_gen/src/config/feature_config.dart';
-import 'package:feature_gen/src/generators/data_generator.dart';
+import 'package:dart_feature_gen/src/config/feature_config.dart';
+import 'package:dart_feature_gen/src/generators/data_generator.dart';
 import 'package:file/file.dart';
 import 'package:test/test.dart';
 import 'package:file/memory.dart';

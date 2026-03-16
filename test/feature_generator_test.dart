@@ -1,6 +1,6 @@
-import 'package:feature_gen/src/config/feature_config.dart';
-import 'package:feature_gen/src/generators/feature_generator.dart';
-import 'package:feature_gen/src/process/process_runner.dart';
+import 'package:dart_feature_gen/src/config/feature_config.dart';
+import 'package:dart_feature_gen/src/generators/feature_generator.dart';
+import 'package:dart_feature_gen/src/process/process_runner.dart';
 import 'package:file/file.dart';
 import 'package:file/memory.dart';
 import 'package:mason_logger/mason_logger.dart';

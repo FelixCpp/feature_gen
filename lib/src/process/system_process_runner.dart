@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:feature_gen/src/process/process_runner.dart';
+import 'package:dart_feature_gen/src/process/process_runner.dart';
 import 'package:file/file.dart';
 import 'package:path/path.dart' as path;
 

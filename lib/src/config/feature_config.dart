@@ -56,7 +56,7 @@ extension FeatureDirName on FeatureGenConfig {
 }
 
 class ConfigLoader {
-  static const _configFileName = 'feature_gen.yaml';
+  static const _configFileName = 'dart_feature_gen.yaml';
 
   const ConfigLoader({
     required this.logger,

@@ -1,5 +1,5 @@
-import 'package:feature_gen/src/config/feature_config.dart';
-import 'package:feature_gen/src/templates/presentation_templates.dart';
+import 'package:dart_feature_gen/src/config/feature_config.dart';
+import 'package:dart_feature_gen/src/templates/presentation_templates.dart';
 import 'package:file/file.dart';
 import 'package:path/path.dart' as path;
 
