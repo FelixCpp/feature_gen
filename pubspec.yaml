@@ -2,6 +2,7 @@ name: feature_gen
 description: A generate tool for features inside your flutter app.
 version: 1.0.0
 publish_to: https://pub.dev
+repository: https://github.com/FelixCpp/feature_gen
 
 environment:
   sdk: ^3.0.0
