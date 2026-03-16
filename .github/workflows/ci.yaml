@@ -1,0 +1,188 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  release:
+    types: [published]
+
+jobs:
+  # ─────────────────────────────────────────────
+  # 1. Analyze & Format
+  # ─────────────────────────────────────────────
+  analyze:
+    name: Analyze & Format
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Analyze
+        run: dart analyze --fatal-infos
+
+  # ─────────────────────────────────────────────
+  # 2. Test (Matrix über OS & Dart SDK Versionen)
+  # ─────────────────────────────────────────────
+  test:
+    name: Test (Dart ${{ matrix.sdk }} on ${{ matrix.os }})
+    needs: analyze
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        sdk: [stable, beta]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: ${{ matrix.sdk }}
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Run tests
+        run: dart test --reporter=github
+
+      - name: Run tests with coverage
+        if: matrix.os == 'ubuntu-latest' && matrix.sdk == 'stable'
+        run: dart test --coverage=coverage
+
+      - name: Convert coverage to LCOV
+        if: matrix.os == 'ubuntu-latest' && matrix.sdk == 'stable'
+        run: dart pub run coverage:format_coverage --lcov --in=coverage --out=coverage/lcov.info --report-on=lib
+
+      - name: Upload coverage to Codecov
+        if: matrix.os == 'ubuntu-latest' && matrix.sdk == 'stable'
+        uses: codecov/codecov-action@v4
+        with:
+          file: coverage/lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  # ─────────────────────────────────────────────
+  # 3. pub.dev Score Check
+  # ─────────────────────────────────────────────
+  pub-score:
+    name: pub.dev Score Check
+    needs: analyze
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Check pub score (pana)
+        run: |
+          dart pub global activate pana
+          dart pub global run pana --no-warning --exit-code-threshold 40
+
+  # ─────────────────────────────────────────────
+  # 4. Dry-run publish
+  # ─────────────────────────────────────────────
+  publish-dry-run:
+    name: Publish Dry Run
+    needs: [test, pub-score]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Publish dry run
+        run: dart pub publish --dry-run
+
+  # ─────────────────────────────────────────────
+  # 5. Changelog generieren & Release updaten
+  # ─────────────────────────────────────────────
+  changelog:
+    name: Generate Changelog
+    needs: [test, pub-score, publish-dry-run]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && github.event.action == 'published'
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Alle Commits laden damit git-cliff die History lesen kann
+          fetch-depth: 0
+
+      - name: Generate changelog
+        id: changelog
+        uses: orhun/git-cliff-action@v3
+        with:
+          config: cliff.toml
+          args: --verbose
+        env:
+          OUTPUT: CHANGELOG.md
+          GITHUB_REPO: ${{ github.repository }}
+
+      - name: Commit updated CHANGELOG.md
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          # Nur committen wenn sich etwas geändert hat
+          git diff --staged --quiet || git commit -m "chore: update CHANGELOG.md for ${{ github.ref_name }}"
+          git push
+
+      - name: Update GitHub Release notes
+        uses: softprops/action-gh-release@v2
+        with:
+          # Schreibt den generierten Changelog in die GitHub Release Description
+          body: ${{ steps.changelog.outputs.content }}
+
+  # ─────────────────────────────────────────────
+  # 6. Publish to pub.dev
+  # ─────────────────────────────────────────────
+  publish:
+    name: Publish to pub.dev
+    needs: [changelog]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && github.event.action == 'published'
+
+    permissions:
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Publish to pub.dev
+        run: dart pub publish --force

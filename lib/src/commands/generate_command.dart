@@ -68,8 +68,8 @@ class GenerateCommand extends Command<void> {
   @override
   FutureOr<void> run() async {
     final argResults = this.argResults;
-    final args = argResults?.rest;
-    if (argResults == null || args == null || args.isEmpty) {
+    final featureName = argResults?.rest.firstOrNull;
+    if (argResults == null || featureName == null) {
       logger.err(
         'Please provide a feature name. Usage: feature_gen generate <name>',
       );
@@ -82,7 +82,9 @@ class GenerateCommand extends Command<void> {
     );
 
     var config = await configLoader.load(
-        workingDirectory: io.Directory.current.path, featureName: args.first);
+      workingDirectory: io.Directory.current.path,
+      featureName: featureName,
+    );
 
     if (argResults.option('output-dir') case String outputDir) {
       config = config.copyWith(outputDirectory: outputDir);
