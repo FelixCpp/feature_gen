@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'feature_config.dart';
+part of 'cli_feature_gen_config.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -13,99 +13,99 @@ part of 'feature_config.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
-mixin _$FeatureConfig {
+mixin _$CliFeatureGenConfig {
   String get featureName;
-  String get featurePrefix;
-  String get outputDirectory;
-  StateManagement get stateManagement;
+  String? get featurePrefix;
+  String? get outputDir;
+  String? get stateManagement;
 
-  /// Create a copy of FeatureConfig
+  /// Create a copy of CliFeatureGenConfig
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  $FeatureConfigCopyWith<FeatureConfig> get copyWith =>
-      _$FeatureConfigCopyWithImpl<FeatureConfig>(
-          this as FeatureConfig, _$identity);
+  $CliFeatureGenConfigCopyWith<CliFeatureGenConfig> get copyWith =>
+      _$CliFeatureGenConfigCopyWithImpl<CliFeatureGenConfig>(
+          this as CliFeatureGenConfig, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is FeatureConfig &&
+            other is CliFeatureGenConfig &&
             (identical(other.featureName, featureName) ||
                 other.featureName == featureName) &&
             (identical(other.featurePrefix, featurePrefix) ||
                 other.featurePrefix == featurePrefix) &&
-            (identical(other.outputDirectory, outputDirectory) ||
-                other.outputDirectory == outputDirectory) &&
+            (identical(other.outputDir, outputDir) ||
+                other.outputDir == outputDir) &&
             (identical(other.stateManagement, stateManagement) ||
                 other.stateManagement == stateManagement));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, featureName, featurePrefix,
-      outputDirectory, stateManagement);
+  int get hashCode => Object.hash(
+      runtimeType, featureName, featurePrefix, outputDir, stateManagement);
 
   @override
   String toString() {
-    return 'FeatureConfig(featureName: $featureName, featurePrefix: $featurePrefix, outputDirectory: $outputDirectory, stateManagement: $stateManagement)';
+    return 'CliFeatureGenConfig(featureName: $featureName, featurePrefix: $featurePrefix, outputDir: $outputDir, stateManagement: $stateManagement)';
   }
 }
 
 /// @nodoc
-abstract mixin class $FeatureConfigCopyWith<$Res> {
-  factory $FeatureConfigCopyWith(
-          FeatureConfig value, $Res Function(FeatureConfig) _then) =
-      _$FeatureConfigCopyWithImpl;
+abstract mixin class $CliFeatureGenConfigCopyWith<$Res> {
+  factory $CliFeatureGenConfigCopyWith(
+          CliFeatureGenConfig value, $Res Function(CliFeatureGenConfig) _then) =
+      _$CliFeatureGenConfigCopyWithImpl;
   @useResult
   $Res call(
       {String featureName,
-      String featurePrefix,
-      String outputDirectory,
-      StateManagement stateManagement});
+      String? featurePrefix,
+      String? outputDir,
+      String? stateManagement});
 }
 
 /// @nodoc
-class _$FeatureConfigCopyWithImpl<$Res>
-    implements $FeatureConfigCopyWith<$Res> {
-  _$FeatureConfigCopyWithImpl(this._self, this._then);
+class _$CliFeatureGenConfigCopyWithImpl<$Res>
+    implements $CliFeatureGenConfigCopyWith<$Res> {
+  _$CliFeatureGenConfigCopyWithImpl(this._self, this._then);
 
-  final FeatureConfig _self;
-  final $Res Function(FeatureConfig) _then;
+  final CliFeatureGenConfig _self;
+  final $Res Function(CliFeatureGenConfig) _then;
 
-  /// Create a copy of FeatureConfig
+  /// Create a copy of CliFeatureGenConfig
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? featureName = null,
-    Object? featurePrefix = null,
-    Object? outputDirectory = null,
-    Object? stateManagement = null,
+    Object? featurePrefix = freezed,
+    Object? outputDir = freezed,
+    Object? stateManagement = freezed,
   }) {
     return _then(_self.copyWith(
       featureName: null == featureName
           ? _self.featureName
           : featureName // ignore: cast_nullable_to_non_nullable
               as String,
-      featurePrefix: null == featurePrefix
+      featurePrefix: freezed == featurePrefix
           ? _self.featurePrefix
           : featurePrefix // ignore: cast_nullable_to_non_nullable
-              as String,
-      outputDirectory: null == outputDirectory
-          ? _self.outputDirectory
-          : outputDirectory // ignore: cast_nullable_to_non_nullable
-              as String,
-      stateManagement: null == stateManagement
+              as String?,
+      outputDir: freezed == outputDir
+          ? _self.outputDir
+          : outputDir // ignore: cast_nullable_to_non_nullable
+              as String?,
+      stateManagement: freezed == stateManagement
           ? _self.stateManagement
           : stateManagement // ignore: cast_nullable_to_non_nullable
-              as StateManagement,
+              as String?,
     ));
   }
 }
 
-/// Adds pattern-matching-related methods to [FeatureConfig].
-extension FeatureConfigPatterns on FeatureConfig {
+/// Adds pattern-matching-related methods to [CliFeatureGenConfig].
+extension CliFeatureGenConfigPatterns on CliFeatureGenConfig {
   /// A variant of `map` that fallback to returning `orElse`.
   ///
   /// It is equivalent to doing:
@@ -120,12 +120,12 @@ extension FeatureConfigPatterns on FeatureConfig {
 
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>(
-    TResult Function(_FeatureConfig value)? $default, {
+    TResult Function(_CliFeatureGenConfig value)? $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
-      case _FeatureConfig() when $default != null:
+      case _CliFeatureGenConfig() when $default != null:
         return $default(_that);
       case _:
         return orElse();
@@ -147,11 +147,11 @@ extension FeatureConfigPatterns on FeatureConfig {
 
   @optionalTypeArgs
   TResult map<TResult extends Object?>(
-    TResult Function(_FeatureConfig value) $default,
+    TResult Function(_CliFeatureGenConfig value) $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _FeatureConfig():
+      case _CliFeatureGenConfig():
         return $default(_that);
     }
   }
@@ -170,11 +170,11 @@ extension FeatureConfigPatterns on FeatureConfig {
 
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>(
-    TResult? Function(_FeatureConfig value)? $default,
+    TResult? Function(_CliFeatureGenConfig value)? $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _FeatureConfig() when $default != null:
+      case _CliFeatureGenConfig() when $default != null:
         return $default(_that);
       case _:
         return null;
@@ -195,16 +195,16 @@ extension FeatureConfigPatterns on FeatureConfig {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String featureName, String featurePrefix,
-            String outputDirectory, StateManagement stateManagement)?
+    TResult Function(String featureName, String? featurePrefix,
+            String? outputDir, String? stateManagement)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
-      case _FeatureConfig() when $default != null:
-        return $default(_that.featureName, _that.featurePrefix,
-            _that.outputDirectory, _that.stateManagement);
+      case _CliFeatureGenConfig() when $default != null:
+        return $default(_that.featureName, _that.featurePrefix, _that.outputDir,
+            _that.stateManagement);
       case _:
         return orElse();
     }
@@ -225,15 +225,15 @@ extension FeatureConfigPatterns on FeatureConfig {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String featureName, String featurePrefix,
-            String outputDirectory, StateManagement stateManagement)
+    TResult Function(String featureName, String? featurePrefix,
+            String? outputDir, String? stateManagement)
         $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _FeatureConfig():
-        return $default(_that.featureName, _that.featurePrefix,
-            _that.outputDirectory, _that.stateManagement);
+      case _CliFeatureGenConfig():
+        return $default(_that.featureName, _that.featurePrefix, _that.outputDir,
+            _that.stateManagement);
     }
   }
 
@@ -251,15 +251,15 @@ extension FeatureConfigPatterns on FeatureConfig {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String featureName, String featurePrefix,
-            String outputDirectory, StateManagement stateManagement)?
+    TResult? Function(String featureName, String? featurePrefix,
+            String? outputDir, String? stateManagement)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _FeatureConfig() when $default != null:
-        return $default(_that.featureName, _that.featurePrefix,
-            _that.outputDirectory, _that.stateManagement);
+      case _CliFeatureGenConfig() when $default != null:
+        return $default(_that.featureName, _that.featurePrefix, _that.outputDir,
+            _that.stateManagement);
       case _:
         return null;
     }
@@ -268,105 +268,106 @@ extension FeatureConfigPatterns on FeatureConfig {
 
 /// @nodoc
 
-class _FeatureConfig implements FeatureConfig {
-  const _FeatureConfig(
+class _CliFeatureGenConfig implements CliFeatureGenConfig {
+  const _CliFeatureGenConfig(
       {required this.featureName,
       required this.featurePrefix,
-      required this.outputDirectory,
+      required this.outputDir,
       required this.stateManagement});
 
   @override
   final String featureName;
   @override
-  final String featurePrefix;
+  final String? featurePrefix;
   @override
-  final String outputDirectory;
+  final String? outputDir;
   @override
-  final StateManagement stateManagement;
+  final String? stateManagement;
 
-  /// Create a copy of FeatureConfig
+  /// Create a copy of CliFeatureGenConfig
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  _$FeatureConfigCopyWith<_FeatureConfig> get copyWith =>
-      __$FeatureConfigCopyWithImpl<_FeatureConfig>(this, _$identity);
+  _$CliFeatureGenConfigCopyWith<_CliFeatureGenConfig> get copyWith =>
+      __$CliFeatureGenConfigCopyWithImpl<_CliFeatureGenConfig>(
+          this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _FeatureConfig &&
+            other is _CliFeatureGenConfig &&
             (identical(other.featureName, featureName) ||
                 other.featureName == featureName) &&
             (identical(other.featurePrefix, featurePrefix) ||
                 other.featurePrefix == featurePrefix) &&
-            (identical(other.outputDirectory, outputDirectory) ||
-                other.outputDirectory == outputDirectory) &&
+            (identical(other.outputDir, outputDir) ||
+                other.outputDir == outputDir) &&
             (identical(other.stateManagement, stateManagement) ||
                 other.stateManagement == stateManagement));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, featureName, featurePrefix,
-      outputDirectory, stateManagement);
+  int get hashCode => Object.hash(
+      runtimeType, featureName, featurePrefix, outputDir, stateManagement);
 
   @override
   String toString() {
-    return 'FeatureConfig(featureName: $featureName, featurePrefix: $featurePrefix, outputDirectory: $outputDirectory, stateManagement: $stateManagement)';
+    return 'CliFeatureGenConfig(featureName: $featureName, featurePrefix: $featurePrefix, outputDir: $outputDir, stateManagement: $stateManagement)';
   }
 }
 
 /// @nodoc
-abstract mixin class _$FeatureConfigCopyWith<$Res>
-    implements $FeatureConfigCopyWith<$Res> {
-  factory _$FeatureConfigCopyWith(
-          _FeatureConfig value, $Res Function(_FeatureConfig) _then) =
-      __$FeatureConfigCopyWithImpl;
+abstract mixin class _$CliFeatureGenConfigCopyWith<$Res>
+    implements $CliFeatureGenConfigCopyWith<$Res> {
+  factory _$CliFeatureGenConfigCopyWith(_CliFeatureGenConfig value,
+          $Res Function(_CliFeatureGenConfig) _then) =
+      __$CliFeatureGenConfigCopyWithImpl;
   @override
   @useResult
   $Res call(
       {String featureName,
-      String featurePrefix,
-      String outputDirectory,
-      StateManagement stateManagement});
+      String? featurePrefix,
+      String? outputDir,
+      String? stateManagement});
 }
 
 /// @nodoc
-class __$FeatureConfigCopyWithImpl<$Res>
-    implements _$FeatureConfigCopyWith<$Res> {
-  __$FeatureConfigCopyWithImpl(this._self, this._then);
+class __$CliFeatureGenConfigCopyWithImpl<$Res>
+    implements _$CliFeatureGenConfigCopyWith<$Res> {
+  __$CliFeatureGenConfigCopyWithImpl(this._self, this._then);
 
-  final _FeatureConfig _self;
-  final $Res Function(_FeatureConfig) _then;
+  final _CliFeatureGenConfig _self;
+  final $Res Function(_CliFeatureGenConfig) _then;
 
-  /// Create a copy of FeatureConfig
+  /// Create a copy of CliFeatureGenConfig
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $Res call({
     Object? featureName = null,
-    Object? featurePrefix = null,
-    Object? outputDirectory = null,
-    Object? stateManagement = null,
+    Object? featurePrefix = freezed,
+    Object? outputDir = freezed,
+    Object? stateManagement = freezed,
   }) {
-    return _then(_FeatureConfig(
+    return _then(_CliFeatureGenConfig(
       featureName: null == featureName
           ? _self.featureName
           : featureName // ignore: cast_nullable_to_non_nullable
               as String,
-      featurePrefix: null == featurePrefix
+      featurePrefix: freezed == featurePrefix
           ? _self.featurePrefix
           : featurePrefix // ignore: cast_nullable_to_non_nullable
-              as String,
-      outputDirectory: null == outputDirectory
-          ? _self.outputDirectory
-          : outputDirectory // ignore: cast_nullable_to_non_nullable
-              as String,
-      stateManagement: null == stateManagement
+              as String?,
+      outputDir: freezed == outputDir
+          ? _self.outputDir
+          : outputDir // ignore: cast_nullable_to_non_nullable
+              as String?,
+      stateManagement: freezed == stateManagement
           ? _self.stateManagement
           : stateManagement // ignore: cast_nullable_to_non_nullable
-              as StateManagement,
+              as String?,
     ));
   }
 }
