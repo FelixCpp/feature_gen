@@ -3,24 +3,6 @@
 All notable changes to this project will be documented in this file.
 Versions follow [Semantic Versioning](https://semver.org).
 
-## [1.1.0] - 2026-03-17
-
-### Bug Fixes
-
-- Fixed path creation ([`4676356`](467635688a78735e154432c5a14f131681d31361))
-
-### Other
-
-- Validation ([`1381ceb`](1381cebb246b321f06eb3a868c7ed5e15f52f7d6))
-- Added parsers for yaml, cli and merge ([`5e2b63a`](5e2b63a7e4e1a2afcd2d913689294d46f11a6c61))
-- Added feature generation ([`cb5ebf4`](cb5ebf45dde8e604264efc66bce9f2f67f6728b5))
-- Presentation tests ([`db5578a`](db5578a369203d4cc65e37c371002789723363b9))
-- Added process runner ([`f305987`](f3059870bfa3a1892eeb5880720d8ce2bbe175d4))
-- Merge pull request #7 from FelixCpp/feat/better_config ([`35ffe12`](35ffe12d4b06d69d0d96368cbcdf1f7714b86b94))
-- Added flags for code formatting & generation ([`c44f99c`](c44f99c1cbca03a2079ce88e4c48848abab532c9))
-- Removed unused imported from generated code ([`3be7f49`](3be7f49802ac024a22c151fb39b0ec50c9680dcc))
-- Merge pull request #8 from FelixCpp/develop ([`51bd2b5`](51bd2b5a87c8f26f4e9eaf48d7cf40dd1220a49d))
-
 ## [1.0.0] - 2026-03-16
 
 ### Bug Fixes
