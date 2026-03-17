@@ -1,56 +1,68 @@
-import 'package:dart_feature_gen/src/config/feature_config.dart';
-import 'package:dart_feature_gen/src/templates/data_templates.dart';
-import 'package:file/file.dart';
-import 'package:path/path.dart' as path;
+import 'package:dart_feature_gen/src/feature_gen_config.dart';
+import 'package:dart_feature_gen/src/io/feature_gen_io.dart';
+import 'package:mason_logger/mason_logger.dart';
+import 'package:path/path.dart';
+import 'package:recase/recase.dart';
 
 class DataGenerator {
-  final FeatureGenConfig config;
-  final FileSystem fileSystem;
-
   const DataGenerator({
-    required this.config,
-    required this.fileSystem,
+    required this.logger,
+    required this.io,
   });
 
-  Future<void> generate() async {
-    final featurePath = path.join(
-      config.outputDirectory,
-      config.featureDirName,
-      'data',
+  final Logger logger;
+  final FeatureGenIO io;
+
+  Future<void> generate(FeatureGenConfig config) async {
+    final dataDirectory = joinAll([config.featurePath, 'data']);
+    await io.createDirectory(dataDirectory);
+
+    await io.createFile(
+      joinAll([dataDirectory, 'daos', '${config.featureName}_dao.dart']),
+      _Templates.dao(config.featureName),
     );
 
-    await _createFile(
-      path.join(
-        featurePath,
+    await io.createFile(
+      joinAll([
+        dataDirectory,
         'repositories',
-        '${config.featureName}_repository_impl.dart',
-      ),
-      DataTemplates.repositoryImpl(config.featureName),
+        '${config.featureName}_repository_impl.dart'
+      ]),
+      _Templates.repositoryImpl(config.featureName),
     );
 
-    await _createFile(
-      path.join(
-        featurePath,
-        'datasources',
-        '${config.featureName}_remote_datasource.dart',
-      ),
-      DataTemplates.remoteDatasource(config.featureName),
-    );
-
-    await _createFile(
-      path.join(featurePath, 'daos', '${config.featureName}_dao.dart'),
-      DataTemplates.dao(config.featureName),
-    );
-
-    await _createFile(
-      path.join(featurePath, 'di', '${config.featureName}_data_module.dart'),
-      DataTemplates.diModule(config.featureName),
+    await io.createFile(
+      joinAll([dataDirectory, 'di', '${config.featureName}_module.dart']),
+      _Templates.diModule(config.featureName),
     );
   }
+}
 
-  Future<void> _createFile(String filepath, String content) async {
-    final file = fileSystem.file(filepath);
-    await file.parent.create(recursive: true);
-    await file.writeAsString(content);
+abstract final class _Templates {
+  static String dao(String featureName) {
+    final className = featureName.pascalCase;
+
+    return '''
+class ${className}Dao {
+  // TODO: Implement Database-Access-Object
+}
+''';
+  }
+
+  static String repositoryImpl(String featureName) {
+    final className = featureName.pascalCase;
+    return '''
+import '../../domain/repositories/${featureName}_repository.dart';
+
+class ${className}RepositoryImpl implements ${className}Repository {
+  // TODO: Implement repository
+}
+''';
+  }
+
+  static String diModule(String featureName) {
+    return '''
+// TODO: Implement Dependency-Injection Module
+''';
   }
 }

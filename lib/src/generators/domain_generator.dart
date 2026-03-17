@@ -1,46 +1,43 @@
-import 'package:dart_feature_gen/src/config/feature_config.dart';
-import 'package:dart_feature_gen/src/templates/domain_templates.dart';
-import 'package:file/file.dart';
-import 'package:path/path.dart' as path;
+import 'package:dart_feature_gen/src/feature_gen_config.dart';
+import 'package:dart_feature_gen/src/io/feature_gen_io.dart';
+import 'package:mason_logger/mason_logger.dart';
+import 'package:path/path.dart';
+import 'package:recase/recase.dart';
 
 class DomainGenerator {
-  final FeatureGenConfig config;
-  final FileSystem fileSystem;
+  const DomainGenerator({required this.logger, required this.io});
 
-  const DomainGenerator({
-    required this.config,
-    required this.fileSystem,
-  });
+  final Logger logger;
+  final FeatureGenIO io;
 
-  Future<void> generate() async {
-    final featurePath = path.join(
-      config.outputDirectory,
-      config.featureDirName,
-      'domain',
-    );
+  Future<void> generate(FeatureGenConfig config) async {
+    final domainDirectory = joinAll([config.featurePath, 'domain']);
+    await io.createDirectory(domainDirectory);
+    await io.createDirectory(joinAll([domainDirectory, 'models']));
+    await io
+        .createDirectory(joinAll([domainDirectory, 'usecases', 'interactors']));
+    await io
+        .createDirectory(joinAll([domainDirectory, 'usecases', 'observers']));
 
-    await _createFile(
-      path.join(
-        featurePath,
+    await io.createFile(
+      joinAll([
+        domainDirectory,
         'repositories',
-        '${config.featureName}_repository.dart',
-      ),
-      DomainTemplates.repository(config.featureName),
+        '${config.featureName}_repository.dart'
+      ]),
+      _Templates.repository(config.featureName),
     );
-
-    await _createDirectory(path.join(featurePath, 'models'));
-    await _createDirectory(path.join(featurePath, 'usecases', 'interactors'));
-    await _createDirectory(path.join(featurePath, 'usecases', 'observers'));
   }
+}
 
-  Future<void> _createFile(String filepath, String content) async {
-    final file = fileSystem.file(filepath);
-    await file.parent.create(recursive: true);
-    await file.writeAsString(content);
-  }
+abstract final class _Templates {
+  static String repository(String featureName) {
+    final className = featureName.pascalCase;
 
-  Future<void> _createDirectory(String path) async {
-    final file = fileSystem.directory(path);
-    await file.create(recursive: true);
+    return '''
+abstract interface class ${className}Repository {
+  // TODO: Implement repository contract
+}
+''';
   }
 }

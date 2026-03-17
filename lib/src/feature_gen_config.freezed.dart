@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'feature_config.dart';
+part of 'feature_gen_config.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -15,11 +15,9 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$FeatureGenConfig {
   String get featureName;
-  String get outputDirectory;
   String? get featurePrefix;
-  bool get format;
-  bool get build;
-  StateManagementLibrary get smLibrary;
+  String get outputDirectory;
+  StateManagement get stateManagement;
 
   /// Create a copy of FeatureGenConfig
   /// with the given fields replaced by the non-null parameter values.
@@ -36,23 +34,21 @@ mixin _$FeatureGenConfig {
             other is FeatureGenConfig &&
             (identical(other.featureName, featureName) ||
                 other.featureName == featureName) &&
-            (identical(other.outputDirectory, outputDirectory) ||
-                other.outputDirectory == outputDirectory) &&
             (identical(other.featurePrefix, featurePrefix) ||
                 other.featurePrefix == featurePrefix) &&
-            (identical(other.format, format) || other.format == format) &&
-            (identical(other.build, build) || other.build == build) &&
-            (identical(other.smLibrary, smLibrary) ||
-                other.smLibrary == smLibrary));
+            (identical(other.outputDirectory, outputDirectory) ||
+                other.outputDirectory == outputDirectory) &&
+            (identical(other.stateManagement, stateManagement) ||
+                other.stateManagement == stateManagement));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, featureName, outputDirectory,
-      featurePrefix, format, build, smLibrary);
+  int get hashCode => Object.hash(runtimeType, featureName, featurePrefix,
+      outputDirectory, stateManagement);
 
   @override
   String toString() {
-    return 'FeatureGenConfig(featureName: $featureName, outputDirectory: $outputDirectory, featurePrefix: $featurePrefix, format: $format, build: $build, smLibrary: $smLibrary)';
+    return 'FeatureGenConfig(featureName: $featureName, featurePrefix: $featurePrefix, outputDirectory: $outputDirectory, stateManagement: $stateManagement)';
   }
 }
 
@@ -64,11 +60,9 @@ abstract mixin class $FeatureGenConfigCopyWith<$Res> {
   @useResult
   $Res call(
       {String featureName,
-      String outputDirectory,
       String? featurePrefix,
-      bool format,
-      bool build,
-      StateManagementLibrary smLibrary});
+      String outputDirectory,
+      StateManagement stateManagement});
 }
 
 /// @nodoc
@@ -85,37 +79,27 @@ class _$FeatureGenConfigCopyWithImpl<$Res>
   @override
   $Res call({
     Object? featureName = null,
-    Object? outputDirectory = null,
     Object? featurePrefix = freezed,
-    Object? format = null,
-    Object? build = null,
-    Object? smLibrary = null,
+    Object? outputDirectory = null,
+    Object? stateManagement = null,
   }) {
     return _then(_self.copyWith(
       featureName: null == featureName
           ? _self.featureName
           : featureName // ignore: cast_nullable_to_non_nullable
               as String,
-      outputDirectory: null == outputDirectory
-          ? _self.outputDirectory
-          : outputDirectory // ignore: cast_nullable_to_non_nullable
-              as String,
       featurePrefix: freezed == featurePrefix
           ? _self.featurePrefix
           : featurePrefix // ignore: cast_nullable_to_non_nullable
               as String?,
-      format: null == format
-          ? _self.format
-          : format // ignore: cast_nullable_to_non_nullable
-              as bool,
-      build: null == build
-          ? _self.build
-          : build // ignore: cast_nullable_to_non_nullable
-              as bool,
-      smLibrary: null == smLibrary
-          ? _self.smLibrary
-          : smLibrary // ignore: cast_nullable_to_non_nullable
-              as StateManagementLibrary,
+      outputDirectory: null == outputDirectory
+          ? _self.outputDirectory
+          : outputDirectory // ignore: cast_nullable_to_non_nullable
+              as String,
+      stateManagement: null == stateManagement
+          ? _self.stateManagement
+          : stateManagement // ignore: cast_nullable_to_non_nullable
+              as StateManagement,
     ));
   }
 }
@@ -211,21 +195,16 @@ extension FeatureGenConfigPatterns on FeatureGenConfig {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(
-            String featureName,
-            String outputDirectory,
-            String? featurePrefix,
-            bool format,
-            bool build,
-            StateManagementLibrary smLibrary)?
+    TResult Function(String featureName, String? featurePrefix,
+            String outputDirectory, StateManagement stateManagement)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _FeatureGenConfig() when $default != null:
-        return $default(_that.featureName, _that.outputDirectory,
-            _that.featurePrefix, _that.format, _that.build, _that.smLibrary);
+        return $default(_that.featureName, _that.featurePrefix,
+            _that.outputDirectory, _that.stateManagement);
       case _:
         return orElse();
     }
@@ -246,20 +225,15 @@ extension FeatureGenConfigPatterns on FeatureGenConfig {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(
-            String featureName,
-            String outputDirectory,
-            String? featurePrefix,
-            bool format,
-            bool build,
-            StateManagementLibrary smLibrary)
+    TResult Function(String featureName, String? featurePrefix,
+            String outputDirectory, StateManagement stateManagement)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _FeatureGenConfig():
-        return $default(_that.featureName, _that.outputDirectory,
-            _that.featurePrefix, _that.format, _that.build, _that.smLibrary);
+        return $default(_that.featureName, _that.featurePrefix,
+            _that.outputDirectory, _that.stateManagement);
     }
   }
 
@@ -277,20 +251,15 @@ extension FeatureGenConfigPatterns on FeatureGenConfig {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(
-            String featureName,
-            String outputDirectory,
-            String? featurePrefix,
-            bool format,
-            bool build,
-            StateManagementLibrary smLibrary)?
+    TResult? Function(String featureName, String? featurePrefix,
+            String outputDirectory, StateManagement stateManagement)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _FeatureGenConfig() when $default != null:
-        return $default(_that.featureName, _that.outputDirectory,
-            _that.featurePrefix, _that.format, _that.build, _that.smLibrary);
+        return $default(_that.featureName, _that.featurePrefix,
+            _that.outputDirectory, _that.stateManagement);
       case _:
         return null;
     }
@@ -302,24 +271,18 @@ extension FeatureGenConfigPatterns on FeatureGenConfig {
 class _FeatureGenConfig implements FeatureGenConfig {
   const _FeatureGenConfig(
       {required this.featureName,
-      required this.outputDirectory,
       required this.featurePrefix,
-      required this.format,
-      required this.build,
-      required this.smLibrary});
+      required this.outputDirectory,
+      required this.stateManagement});
 
   @override
   final String featureName;
   @override
-  final String outputDirectory;
-  @override
   final String? featurePrefix;
   @override
-  final bool format;
+  final String outputDirectory;
   @override
-  final bool build;
-  @override
-  final StateManagementLibrary smLibrary;
+  final StateManagement stateManagement;
 
   /// Create a copy of FeatureGenConfig
   /// with the given fields replaced by the non-null parameter values.
@@ -336,23 +299,21 @@ class _FeatureGenConfig implements FeatureGenConfig {
             other is _FeatureGenConfig &&
             (identical(other.featureName, featureName) ||
                 other.featureName == featureName) &&
-            (identical(other.outputDirectory, outputDirectory) ||
-                other.outputDirectory == outputDirectory) &&
             (identical(other.featurePrefix, featurePrefix) ||
                 other.featurePrefix == featurePrefix) &&
-            (identical(other.format, format) || other.format == format) &&
-            (identical(other.build, build) || other.build == build) &&
-            (identical(other.smLibrary, smLibrary) ||
-                other.smLibrary == smLibrary));
+            (identical(other.outputDirectory, outputDirectory) ||
+                other.outputDirectory == outputDirectory) &&
+            (identical(other.stateManagement, stateManagement) ||
+                other.stateManagement == stateManagement));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, featureName, outputDirectory,
-      featurePrefix, format, build, smLibrary);
+  int get hashCode => Object.hash(runtimeType, featureName, featurePrefix,
+      outputDirectory, stateManagement);
 
   @override
   String toString() {
-    return 'FeatureGenConfig(featureName: $featureName, outputDirectory: $outputDirectory, featurePrefix: $featurePrefix, format: $format, build: $build, smLibrary: $smLibrary)';
+    return 'FeatureGenConfig(featureName: $featureName, featurePrefix: $featurePrefix, outputDirectory: $outputDirectory, stateManagement: $stateManagement)';
   }
 }
 
@@ -366,11 +327,9 @@ abstract mixin class _$FeatureGenConfigCopyWith<$Res>
   @useResult
   $Res call(
       {String featureName,
-      String outputDirectory,
       String? featurePrefix,
-      bool format,
-      bool build,
-      StateManagementLibrary smLibrary});
+      String outputDirectory,
+      StateManagement stateManagement});
 }
 
 /// @nodoc
@@ -387,37 +346,27 @@ class __$FeatureGenConfigCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? featureName = null,
-    Object? outputDirectory = null,
     Object? featurePrefix = freezed,
-    Object? format = null,
-    Object? build = null,
-    Object? smLibrary = null,
+    Object? outputDirectory = null,
+    Object? stateManagement = null,
   }) {
     return _then(_FeatureGenConfig(
       featureName: null == featureName
           ? _self.featureName
           : featureName // ignore: cast_nullable_to_non_nullable
               as String,
-      outputDirectory: null == outputDirectory
-          ? _self.outputDirectory
-          : outputDirectory // ignore: cast_nullable_to_non_nullable
-              as String,
       featurePrefix: freezed == featurePrefix
           ? _self.featurePrefix
           : featurePrefix // ignore: cast_nullable_to_non_nullable
               as String?,
-      format: null == format
-          ? _self.format
-          : format // ignore: cast_nullable_to_non_nullable
-              as bool,
-      build: null == build
-          ? _self.build
-          : build // ignore: cast_nullable_to_non_nullable
-              as bool,
-      smLibrary: null == smLibrary
-          ? _self.smLibrary
-          : smLibrary // ignore: cast_nullable_to_non_nullable
-              as StateManagementLibrary,
+      outputDirectory: null == outputDirectory
+          ? _self.outputDirectory
+          : outputDirectory // ignore: cast_nullable_to_non_nullable
+              as String,
+      stateManagement: null == stateManagement
+          ? _self.stateManagement
+          : stateManagement // ignore: cast_nullable_to_non_nullable
+              as StateManagement,
     ));
   }
 }

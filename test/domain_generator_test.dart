@@ -1,8 +1,11 @@
-import 'package:dart_feature_gen/src/config/feature_config.dart';
+import 'package:dart_feature_gen/src/feature_gen_config.dart';
 import 'package:dart_feature_gen/src/generators/domain_generator.dart';
+import 'package:dart_feature_gen/src/io/feature_gen_io.dart';
 import 'package:file/file.dart';
-import 'package:test/test.dart';
 import 'package:file/memory.dart';
+import 'package:mason_logger/mason_logger.dart';
+import 'package:test/test.dart';
+import 'package:path/path.dart' as path;
 
 void main() {
   group(DomainGenerator, () {
@@ -10,54 +13,63 @@ void main() {
     late DomainGenerator generator;
 
     setUp(() {
+      final logger = Logger(level: Level.quiet);
       fileSystem = MemoryFileSystem.test();
       generator = DomainGenerator(
-        config: FeatureGenConfig(
-          featureName: 'counter',
-          outputDirectory: 'lib/features',
-          featurePrefix: null,
-          format: true,
-          build: true,
-          smLibrary: StateManagementLibrary.bloc,
+        logger: logger,
+        io: FeatureGenIO(
+          fileSystem: fileSystem,
+          logger: logger,
         ),
-        fileSystem: fileSystem,
       );
     });
 
-    test('should generate domain directory', () async {
-      await generator.generate();
-
-      expect(
-        fileSystem.isDirectory('lib/features/counter/domain/models'),
-        completion(isTrue),
+    test('should generate directories and files with correct content',
+        () async {
+      final config = FeatureGenConfig(
+        featureName: 'auth',
+        featurePrefix: null,
+        outputDirectory: '',
+        stateManagement: StateManagement.bloc,
       );
 
+      await generator.generate(config);
+
+      expect(
+        fileSystem.isDirectory(path.join('auth', 'domain', 'models')),
+        completion(isTrue),
+      );
       expect(
         fileSystem
-            .file(
-              'lib/features/counter/domain/repositories/counter_repository.dart',
-            )
+            .file(path.join(
+              'auth',
+              'domain',
+              'repositories',
+              'auth_repository.dart',
+            ))
             .readAsString(),
-        completion(
-          equals('''
-abstract interface class CounterRepository {
-  // TODO: Define repository contract
+        completion(equals('''
+abstract interface class AuthRepository {
+  // TODO: Implement repository contract
 }
-'''),
-        ),
+''')),
       );
-
       expect(
-        fileSystem.isDirectory(
-          'lib/features/counter/domain/usecases/interactors',
-        ),
+        fileSystem.isDirectory(path.join(
+          'auth',
+          'domain',
+          'usecases',
+          'interactors',
+        )),
         completion(isTrue),
       );
-
       expect(
-        fileSystem.isDirectory(
-          'lib/features/counter/domain/usecases/observers',
-        ),
+        fileSystem.isDirectory(path.join(
+          'auth',
+          'domain',
+          'usecases',
+          'observers',
+        )),
         completion(isTrue),
       );
     });
