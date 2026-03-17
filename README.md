@@ -1,6 +1,6 @@
 # dart_feature_gen
 
-A Dart CLI tool that generates clean, consistent feature structures for Flutter apps following clean architecture principles — including automatic `dart format` and optional `build_runner` execution.
+A Dart CLI tool that generates clean, consistent feature structures for Flutter apps following clean architecture principles.
 
 ---
 
@@ -20,9 +20,9 @@ A Dart CLI tool that generates clean, consistent feature structures for Flutter 
 
 ## Overview
 
-In larger Flutter projects, every feature tends to follow the same folder structure: a `data` layer, a `domain` layer, and a `presentation` layer. Creating this by hand is repetitive and error-prone.
+In larger Flutter projects, every feature tends to follow the same folder structure: a `data` layer, a `domain` layer, and a `presentation` layer. Creating this by hand is really repetitive.
 
-`dart_feature_gen` automates this entirely. One command creates the full directory tree, populates every file with the correct boilerplate, formats the output with `dart format`, and optionally triggers `build_runner` to generate Freezed classes and other code-gen output — scoped only to the new feature to keep build times short.
+`dart_feature_gen` automates this entirely. One command creates the full directory tree, populates every file with the correct boilerplate.
 
 ---
 
@@ -66,12 +66,6 @@ Each file is pre-populated with the correct class name (derived from the feature
 dart pub global activate dart_feature_gen
 ```
 
-Make sure your Dart pub cache is on your PATH. Add the following to your shell config (`.zshrc`, `.bashrc`, etc.) if it isn't already:
-
-```bash
-export PATH="$PATH:$HOME/.pub-cache/bin"
-```
-
 ### Option B: From source
 
 ```bash
@@ -83,7 +77,7 @@ dart pub global activate --source path .
 ### Option C: Run without installing
 
 ```bash
-dart run bin/dart_feature_gen.dart generate auth
+dart run bin/dart_feature_gen.dart generate --feature-name=auth
 ```
 
 ---
@@ -94,28 +88,28 @@ dart run bin/dart_feature_gen.dart generate auth
 
 ```bash
 # Generate a feature named "auth" under lib/features/
-dart_feature_gen generate auth
+dart_feature_gen generate --feature-name=auth
 ```
 
 ### Custom output directory
 
 ```bash
 # Generate under a different directory
-dart_feature_gen generate auth --output-dir lib/src/features
+dart_feature_gen generate --feature-name=auth --output-dir=lib/src/features
 ```
 
 ### Directory prefix
 
 ```bash
 # Generate using a prefix. Output: lib/src/features/feat_auth/...
-dart_feature_gen generate auth --feature-prefix feat --output-dir lib/src/features
+dart_feature_gen generate --feature-name=auth --feature-prefix=feat --output-dir=lib/src/features
 ```
 
 ### Skip build_runner
 
 ```bash
 # Only generate files and run dart format — skip build_runner
-dart_feature_gen generate auth --no-build
+dart_feature_gen generate --feature-name=auth --no-code-generate
 ```
 
 ### Multi-word feature names
@@ -145,10 +139,10 @@ output-dir: lib/features
 feature-prefix: feat
 
 # Run dart format after generation (default: true)
-format: true
+code-format: true
 
 # Run build_runner after generation, if available (default: true)
-build_runner: true
+code-generate: true
 ```
 
 CLI flags always take precedence over `dart_feature_gen.yaml` values.
@@ -157,11 +151,15 @@ CLI flags always take precedence over `dart_feature_gen.yaml` values.
 
 ## Options & Flags
 
-| Option / Flag | Short | Default | Description |
-|---|---|---|---|
-| `--path` | `-p` | `lib/features` | Base directory for the generated feature |
-| `--build` / `--no-build` | | `true` | Run `build_runner` after generation |
-| `--help` | `-h` | | Show usage information |
+| Option / Flag | Short | Mandatory | Default | Description |
+|---|---|---|---|---|
+| --help | -h | | | Show usage information |
+| --feature-name | -n | yes | | Name of the feature |
+| --feature-prefix | -p | no | | Directory prefix separated by '_' |
+| --output-dir | -o | no | lib/features | Directory where the feature is being generated to |
+| --state-management | | no | bloc | Which state management library to use for the presentation layer |
+| --(no)-code-format | | no | true | Whether to run the code formatter (dart format) afterwards |
+| --(no)-code-generate | | no | true | Whether to run the code generator (build_runner) afterwards |
 
 ---
 
@@ -173,13 +171,10 @@ CLI flags always take precedence over `dart_feature_gen.yaml` values.
 
 3. **`build_runner`** — If `build_runner` is listed as a dependency in your project's `pubspec.yaml`, it runs:
    ```bash
-   dart run build_runner build \
-     --build-filter="<package_name>|lib/features/<feature_name>/**" \
-     --delete-conflicting-outputs
+   dart run build_runner build --delete-conflicting-outputs
    ```
-   The `--build-filter` flag scopes the build to only the new feature, so existing generated files are not touched and build times stay fast.
 
-> **Note:** `build_runner` is detected automatically from your project's `pubspec.yaml`. If it is not present, the step is skipped without error.
+> **Note:** `build_runner is required to be listed as a (dev-)dependency inside your pubspec.yaml file.
 
 ---
 
@@ -219,5 +214,5 @@ dart test
 ## Requirements
 
 - **Dart SDK** `>=3.0.0`
-- **Flutter project** with a `pubspec.yaml` in the working directory
+- **Dart/Flutter project** with a `pubspec.yaml` in the working directory
 - `build_runner` and `freezed` in your Flutter project's `dev_dependencies` (only required if you want the build step)

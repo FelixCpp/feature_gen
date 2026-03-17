@@ -6,6 +6,7 @@ class GenerateCommand extends Command<CliFeatureGenConfig> {
   GenerateCommand({required this.logger}) {
     argParser.addOption(
       'feature-name',
+      abbr: 'n',
       help: 'The name of the feature',
       valueHelp: 'auth',
       mandatory: true,
