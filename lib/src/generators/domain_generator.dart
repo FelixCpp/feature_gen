@@ -12,12 +12,14 @@ class DomainGenerator {
 
   Future<void> generate(FeatureGenConfig config) async {
     final domainDirectory = joinAll([config.featurePath, 'domain']);
-    io.createDirectory(domainDirectory);
-    io.createDirectory(joinAll([domainDirectory, 'models']));
-    io.createDirectory(joinAll([domainDirectory, 'usecases', 'interactors']));
-    io.createDirectory(joinAll([domainDirectory, 'usecases', 'observers']));
+    await io.createDirectory(domainDirectory);
+    await io.createDirectory(joinAll([domainDirectory, 'models']));
+    await io
+        .createDirectory(joinAll([domainDirectory, 'usecases', 'interactors']));
+    await io
+        .createDirectory(joinAll([domainDirectory, 'usecases', 'observers']));
 
-    io.createFile(
+    await io.createFile(
       joinAll([
         domainDirectory,
         'repositories',

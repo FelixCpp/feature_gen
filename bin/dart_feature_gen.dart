@@ -27,7 +27,7 @@ Future<void> main(List<String> arguments) async {
     return;
   }
 
-  final mergedConfig = mergeConfigs(cli: cliConfig, yaml: yamlConfig);
+  final mergedConfig = mergeConfigs(io: io, cli: cliConfig, yaml: yamlConfig);
   final generator = FeatureGenerator(logger: logger, io: io);
   await generator.generate(mergedConfig);
 }

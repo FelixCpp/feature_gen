@@ -15,14 +15,14 @@ class DataGenerator {
 
   Future<void> generate(FeatureGenConfig config) async {
     final dataDirectory = joinAll([config.featurePath, 'data']);
-    io.createDirectory(dataDirectory);
+    await io.createDirectory(dataDirectory);
 
-    io.createFile(
+    await io.createFile(
       joinAll([dataDirectory, 'daos', '${config.featureName}_dao.dart']),
       _Templates.dao(config.featureName),
     );
 
-    io.createFile(
+    await io.createFile(
       joinAll([
         dataDirectory,
         'repositories',
@@ -31,7 +31,7 @@ class DataGenerator {
       _Templates.repositoryImpl(config.featureName),
     );
 
-    io.createFile(
+    await io.createFile(
       joinAll([dataDirectory, 'di', '${config.featureName}_module.dart']),
       _Templates.diModule(config.featureName),
     );

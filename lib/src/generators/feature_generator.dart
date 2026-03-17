@@ -6,10 +6,12 @@ import 'package:dart_feature_gen/src/io/feature_gen_io.dart';
 import 'package:mason_logger/mason_logger.dart';
 
 class FeatureGenerator {
-  FeatureGenerator({required this.logger, required FeatureGenIO io})
-      : dataGenerator = DataGenerator(logger: logger, io: io),
+  FeatureGenerator({
+    required this.logger,
+    required FeatureGenIO io,
+  })  : dataGenerator = DataGenerator(logger: logger, io: io),
         domainGenerator = DomainGenerator(logger: logger, io: io),
-        presentationGenerator = PresentationGenerator(logger: logger);
+        presentationGenerator = PresentationGenerator(logger: logger, io: io);
 
   final Logger logger;
   final DataGenerator dataGenerator;

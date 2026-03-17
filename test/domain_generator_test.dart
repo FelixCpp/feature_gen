@@ -1,0 +1,61 @@
+import 'package:dart_feature_gen/src/feature_gen_config.dart';
+import 'package:dart_feature_gen/src/generators/domain_generator.dart';
+import 'package:dart_feature_gen/src/io/feature_gen_io.dart';
+import 'package:file/file.dart';
+import 'package:file/memory.dart';
+import 'package:mason_logger/mason_logger.dart';
+import 'package:test/test.dart';
+
+void main() {
+  group(DomainGenerator, () {
+    late FileSystem fileSystem;
+    late DomainGenerator generator;
+
+    setUp(() {
+      final logger = Logger(level: Level.quiet);
+      fileSystem = MemoryFileSystem.test();
+      generator = DomainGenerator(
+        logger: logger,
+        io: FeatureGenIO(
+          fileSystem: fileSystem,
+          logger: logger,
+        ),
+      );
+    });
+
+    test('should generate directories and files with correct content',
+        () async {
+      final config = FeatureGenConfig(
+        featureName: 'auth',
+        featurePrefix: null,
+        outputDirectory: '',
+        stateManagement: StateManagement.bloc,
+      );
+
+      await generator.generate(config);
+
+      expect(
+        fileSystem.isDirectory('auth/domain/models'),
+        completion(isTrue),
+      );
+      expect(
+        fileSystem
+            .file('auth/domain/repositories/auth_repository.dart')
+            .readAsString(),
+        completion(equals('''
+abstract interface class AuthRepository {
+  // TODO: Implement repository contract
+}
+''')),
+      );
+      expect(
+        fileSystem.isDirectory('auth/domain/usecases/interactors'),
+        completion(isTrue),
+      );
+      expect(
+        fileSystem.isDirectory('auth/domain/usecases/observers'),
+        completion(isTrue),
+      );
+    });
+  });
+}
