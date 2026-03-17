@@ -110,7 +110,7 @@ class ${className}Bloc extends Bloc<${className}Event, ${className}State> {
     on<_OnSetup>(_onSetup);
   }
 
-  FutureOr<void> _onSetup(_OnSetup event, Emit<${className}State> emit) {
+  FutureOr<void> _onSetup(_OnSetup event, Emitter<${className}State> emit) {
     // TODO: Implement setup logic
   }
 }
@@ -127,6 +127,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'bloc/${featureName}_bloc.dart';
 
 class ${className}Screen extends StatelessWidget {
+  const ${className}Screen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -202,6 +204,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'cubit/${featureName}_cubit.dart';
 
 class ${className}Screen extends StatelessWidget {
+  const ${className}Screen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(

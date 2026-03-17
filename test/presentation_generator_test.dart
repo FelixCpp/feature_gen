@@ -97,7 +97,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<_OnSetup>(_onSetup);
   }
 
-  FutureOr<void> _onSetup(_OnSetup event, Emit<AuthState> emit) {
+  FutureOr<void> _onSetup(_OnSetup event, Emitter<AuthState> emit) {
     // TODO: Implement setup logic
   }
 }
@@ -117,6 +117,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'bloc/auth_bloc.dart';
 
 class AuthScreen extends StatelessWidget {
+  const AuthScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -218,6 +220,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'cubit/auth_cubit.dart';
 
 class AuthScreen extends StatelessWidget {
+  const AuthScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
