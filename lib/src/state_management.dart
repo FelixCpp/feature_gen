@@ -1,0 +1,4 @@
+enum StateManagement {
+  bloc,
+  cubit,
+}
