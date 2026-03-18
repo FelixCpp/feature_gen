@@ -138,6 +138,10 @@ output-dir: lib/features
 # Note that the prefix is being put separated using a "_" character.
 feature-prefix: feat
 
+# State management library to use. Possible values are
+# bloc, cubit as well as riverpod.
+state-management: bloc
+
 # Run dart format after generation (default: true)
 code-format: true
 
