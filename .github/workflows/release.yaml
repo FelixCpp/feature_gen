@@ -1,10 +1,10 @@
-name: Publish to pub.dev
+name: Release
 
 on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: "Dry run (kein echtes Publishing)"
+        description: "Dry run (no actual publishing)"
         required: false
         default: false
         type: boolean
@@ -14,8 +14,8 @@ on:
 
 jobs:
   # ─────────────────────────────────────────────────────────────
-  # Job 1: Manuell gestartet → validieren, CHANGELOG, Tag pushen
-  # Pusht den Tag via PAT → GitHub erlaubt dadurch den Workflow-Trigger
+  # Job 1: Triggered manually → validate, update CHANGELOG, push tag
+  # Uses a PAT so the tag push re-triggers this workflow's publish job
   # ─────────────────────────────────────────────────────────────
   prepare:
     name: Prepare Release
@@ -30,7 +30,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          # PAT statt GITHUB_TOKEN → Tag-Push triggert den publish-Job
+          # PAT instead of GITHUB_TOKEN so the tag push triggers the publish job
           token: ${{ secrets.RELEASE_PAT }}
 
       - name: Setup Dart
@@ -53,7 +53,7 @@ jobs:
         run: |
           TAG="${{ steps.version.outputs.tag }}"
           if git ls-remote --tags origin | grep -q "refs/tags/$TAG$"; then
-            echo "❌ Tag $TAG existiert bereits! Bitte Version in pubspec.yaml erhöhen."
+            echo "❌ Tag $TAG already exists! Please bump the version in pubspec.yaml."
             exit 1
           fi
 
@@ -81,9 +81,9 @@ jobs:
         run: |
           git-cliff --tag ${{ steps.version.outputs.tag }} -o CHANGELOG.md
           if git diff --quiet CHANGELOG.md; then
-            echo "✅ CHANGELOG.md ist bereits aktuell, nichts zu tun."
+            echo "✅ CHANGELOG.md is already up to date, nothing to do."
           else
-            echo "📝 CHANGELOG.md wurde aktualisiert, committe Änderungen..."
+            echo "📝 CHANGELOG.md was updated, committing changes..."
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git add CHANGELOG.md
@@ -99,12 +99,12 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag "$TAG"
           git push origin "$TAG"
-          # PAT sorgt dafür dass GitHub diesen Push als externen Trigger wertet
-          # → der publish-Job unten wird dadurch ausgelöst
+          # PAT ensures GitHub treats this push as an external trigger
+          # so the publish job below is fired
 
   # ─────────────────────────────────────────────────────────────
-  # Job 2: Läuft nur wenn ein Tag gepusht wurde
-  # GITHUB_REF ist dann ein Tag-Ref → pub.dev OIDC klappt
+  # Job 2: Runs only when a version tag is pushed
+  # GITHUB_REF is a tag ref → pub.dev OIDC authentication succeeds
   # ─────────────────────────────────────────────────────────────
   publish:
     name: Publish & Release
@@ -112,8 +112,8 @@ jobs:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
 
     permissions:
-      id-token: write # OIDC für pub.dev
-      contents: write # GitHub Release erstellen
+      id-token: write # required for pub.dev OIDC
+      contents: write # required for creating a GitHub Release
 
     steps:
       - name: Checkout

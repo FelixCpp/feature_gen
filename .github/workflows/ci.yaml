@@ -1,10 +1,17 @@
 name: CI
 
+# Runs on every push to any branch except main, and on pull requests targeting develop.
+# This covers: pushes to feature branches, pushes to develop (after merge), and
+# pull requests opened against develop.
 on:
   push:
-    branches: ["**"]
+    branches-ignore:
+      - main
+    tags-ignore:
+      - '**'
   pull_request:
-    branches: ["**"]
+    branches:
+      - develop
 
 jobs:
   analyze_and_test:
