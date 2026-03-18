@@ -36,6 +36,7 @@ StateManagement _parseStateManagement(String? value) {
 
   if (value == 'bloc') return StateManagement.bloc;
   if (value == 'cubit') return StateManagement.cubit;
+  if (value == 'riverpod') return StateManagement.riverpod;
 
   throw ArgumentError.value(value);
 }

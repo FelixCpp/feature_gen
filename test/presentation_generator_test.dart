@@ -254,5 +254,110 @@ class _Scaffold extends StatelessWidget {
         );
       },
     );
+
+    test(
+      'should generate directories and files with contents using riverpod',
+      () async {
+        final config = FeatureGenConfig(
+          featureName: 'auth',
+          featurePrefix: null,
+          outputDirectory: '',
+          stateManagement: StateManagement.riverpod,
+          runCodeFormatter: true,
+          runCodeGenerator: true,
+        );
+
+        await generator.generate(config);
+
+        expect(
+            fileSystem
+                .file(path.join(
+                  'auth',
+                  'presentation',
+                  'riverpod',
+                  'auth_state.dart',
+                ))
+                .readAsString(),
+            completion(
+              equals('''
+part of 'auth_notifier.dart';
+
+@freezed
+sealed class AuthState with _\$AuthState {
+  const factory AuthState() = _AuthState;
+
+  factory AuthState.initial() {
+    return const AuthState();
+  }
+}
+'''),
+            ));
+
+        expect(
+          fileSystem
+              .file(path.join(
+                  'auth', 'presentation', 'riverpod', 'auth_notifier.dart'))
+              .readAsString(),
+          completion(
+            equals('''
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'auth_notifier.freezed.dart';
+part 'auth_notifier.g.dart';
+part 'auth_state.dart';
+
+@riverpod
+class AuthNotifier extends _\$AuthNotifier {
+  @override
+  AuthState build() {
+    return AuthState.initial();
+  }
+}
+'''),
+          ),
+        );
+
+        expect(
+          fileSystem
+              .file(path.join('auth', 'presentation', 'auth_screen.dart'))
+              .readAsString(),
+          completion(
+            equals('''
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'riverpod/auth_notifier.dart';
+
+class AuthScreen extends ConsumerWidget {
+  const AuthScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(authProvider);
+
+    ref.listen(authProvider, (previous, next) {
+      // Optional: side effects
+    });
+
+    return _Scaffold(state: state);
+  }
+}
+
+class _Scaffold extends StatelessWidget {
+  const _Scaffold({required this.state});
+
+  final AuthState state;
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+}
+'''),
+          ),
+        );
+      },
+    );
   });
 }

@@ -17,9 +17,10 @@ class PresentationGenerator {
     switch (config.stateManagement) {
       case StateManagement.bloc:
         await _generateBlocFiles(uiDirectory, config.featureName);
-
       case StateManagement.cubit:
         await _generateCubitFiles(uiDirectory, config.featureName);
+      case StateManagement.riverpod:
+        await _generateRiverpodFiles(uiDirectory, config.featureName);
     }
   }
 
@@ -57,6 +58,24 @@ class PresentationGenerator {
     await io.createFile(
       join(directory, '${featureName}_screen.dart'),
       _CubitTemplates.screen(featureName),
+    );
+  }
+
+  Future<void> _generateRiverpodFiles(
+    String directory,
+    String featureName,
+  ) async {
+    await io.createFile(
+      join(directory, 'riverpod', '${featureName}_notifier.dart'),
+      _RiverpodTemplates.notifier(featureName),
+    );
+    await io.createFile(
+      join(directory, 'riverpod', '${featureName}_state.dart'),
+      _RiverpodTemplates.state(featureName),
+    );
+    await io.createFile(
+      join(directory, '${featureName}_screen.dart'),
+      _RiverpodTemplates.screen(featureName),
     );
   }
 }
@@ -227,6 +246,83 @@ class _Scaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
       return const Placeholder();
+  }
+}
+''';
+  }
+}
+
+abstract final class _RiverpodTemplates {
+  static String state(String featureName) {
+    final className = featureName.pascalCase;
+
+    return '''
+part of '${featureName}_notifier.dart';
+
+@freezed
+sealed class ${className}State with _\$${className}State {
+  const factory ${className}State() = _${className}State;
+
+  factory ${className}State.initial() {
+    return const ${className}State();
+  }
+}
+''';
+  }
+
+  static String notifier(String featureName) {
+    final className = featureName.pascalCase;
+
+    return '''
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part '${featureName}_notifier.freezed.dart';
+part '${featureName}_notifier.g.dart';
+part '${featureName}_state.dart';
+
+@riverpod
+class ${className}Notifier extends _\$${className}Notifier {
+  @override
+  ${className}State build() {
+    return ${className}State.initial();
+  }
+}
+''';
+  }
+
+  static String screen(String featureName) {
+    final className = featureName.pascalCase;
+
+    return '''
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'riverpod/${featureName}_notifier.dart';
+
+class ${className}Screen extends ConsumerWidget {
+  const ${className}Screen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(${featureName}Provider);
+
+    ref.listen(${featureName}Provider, (previous, next) {
+      // Optional: side effects
+    });
+
+    return _Scaffold(state: state);
+  }
+}
+
+class _Scaffold extends StatelessWidget {
+  const _Scaffold({required this.state});
+
+  final ${className}State state;
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
   }
 }
 ''';

@@ -6,6 +6,7 @@ part 'feature_gen_config.freezed.dart';
 enum StateManagement {
   bloc,
   cubit,
+  riverpod,
 }
 
 @freezed

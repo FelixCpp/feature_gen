@@ -30,7 +30,7 @@ class GenerateCommand extends Command<CliFeatureGenConfig> {
       'state-management',
       help: 'Which state management library to use for the presentation layer.',
       valueHelp: 'bloc',
-      allowed: {'bloc', 'cubit'},
+      allowed: {'bloc', 'cubit', 'riverpod'},
     );
 
     argParser.addFlag(
