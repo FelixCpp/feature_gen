@@ -14,14 +14,6 @@ class FeatureGenIO {
     return fileSystem.currentDirectory.path;
   }
 
-  Directory getCwdDir() {
-    return fileSystem.currentDirectory;
-  }
-
-  File getFile(String path) {
-    return fileSystem.file(path);
-  }
-
   Future<void> createDirectory(String path) async {
     await fileSystem.directory(path).create(recursive: true);
     logger.success('Successfully create directory "$path"');

@@ -1,24 +1,16 @@
-import 'package:dart_feature_gen/src/io/feature_gen_io.dart';
-import 'package:dart_feature_gen/src/yaml/yaml_config_loader.dart';
-import 'package:file/memory.dart';
+import 'package:dart_feature_gen/src/yaml/yaml_loader.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('YamlLoader', () {
-    late YamlConfigLoader yamlLoader;
+    late YamlLoader yamlLoader;
     setUp(() {
-      final logger = Logger(level: Level.quiet);
-      final fileSystem = MemoryFileSystem.test();
-
-      yamlLoader = YamlConfigLoader(
-        io: FeatureGenIO(fileSystem: fileSystem, logger: logger),
-        logger: logger,
-      );
+      yamlLoader = YamlLoader(logger: Logger(level: Level.quiet));
     });
 
     test('should parse default config', () async {
-      final config = await yamlLoader.loadConfigFromSource('');
+      final config = await yamlLoader.run('');
 
       expect(config.featurePrefix, isNull);
       expect(config.outputDir, isNull);
@@ -26,7 +18,7 @@ void main() {
     });
 
     test('should parse feature prefix', () async {
-      final config = await yamlLoader.loadConfigFromSource('''
+      final config = await yamlLoader.run('''
         feature-prefix: feat
       ''');
 
@@ -36,7 +28,7 @@ void main() {
     });
 
     test('should parse output directory', () async {
-      final config = await yamlLoader.loadConfigFromSource('''
+      final config = await yamlLoader.run('''
         output-dir: libs/features
       ''');
 
@@ -46,7 +38,7 @@ void main() {
     });
 
     test('should parse state management bloc', () async {
-      final config = await yamlLoader.loadConfigFromSource('''
+      final config = await yamlLoader.run('''
         state-management: bloc
       ''');
 
@@ -56,7 +48,7 @@ void main() {
     });
 
     test('should parse state management cubit', () async {
-      final config = await yamlLoader.loadConfigFromSource('''
+      final config = await yamlLoader.run('''
         state-management: cubit
       ''');
 

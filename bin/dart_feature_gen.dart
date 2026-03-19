@@ -5,7 +5,7 @@ import 'package:dart_feature_gen/src/config_parser.dart';
 import 'package:dart_feature_gen/src/generators/feature_generator.dart';
 import 'package:dart_feature_gen/src/io/feature_gen_io.dart';
 import 'package:dart_feature_gen/src/runners/system_process_runner.dart';
-import 'package:dart_feature_gen/src/yaml/yaml_config_loader.dart';
+import 'package:dart_feature_gen/src/yaml/yaml_loader.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:file/local.dart';
 
@@ -24,8 +24,10 @@ Future<void> main(List<String> arguments) async {
     return;
   }
 
-  final yamlLoader = YamlConfigLoader(io: io, logger: logger);
-  final yamlConfig = await yamlLoader.loadConfig();
+  final yamlLoader = YamlLoader(logger: logger);
+  final contents = await io.readFile('dart_feature_gen.yaml') ?? '';
+  final yamlConfig = await yamlLoader.run(contents);
+
   final mergedConfig = mergeConfigs(io: io, cli: cliConfig, yaml: yamlConfig);
   final generator = FeatureGenerator(logger: logger, io: io);
   await generator.generate(mergedConfig);
