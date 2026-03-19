@@ -1,19 +1,20 @@
 import 'package:dart_feature_gen/src/cli/cli_feature_gen_config.dart';
 import 'package:dart_feature_gen/src/feature_gen_config.dart';
-import 'package:dart_feature_gen/src/io/feature_gen_io.dart';
 import 'package:dart_feature_gen/src/yaml/yaml_feature_gen_config.dart';
 import 'package:path/path.dart';
 
 FeatureGenConfig mergeConfigs({
-  required FeatureGenIO io,
   required CliFeatureGenConfig cli,
   required YamlFeatureGenConfig yaml,
+  required String rootDirectoryPath,
 }) {
   return FeatureGenConfig(
     featureName: cli.featureName,
     featurePrefix: cli.featurePrefix ?? yaml.featurePrefix,
-    outputDirectory:
-        _makeOutputDir(io, cli.outputDir ?? yaml.outputDir ?? 'lib/features'),
+    outputDirectory: _makeOutputDir(
+      rootDirectoryPath,
+      cli.outputDir ?? yaml.outputDir ?? 'lib/features',
+    ),
     stateManagement:
         _parseStateManagement(cli.stateManagement ?? yaml.stateManagement),
     runCodeFormatter: cli.runCodeFormatter ?? yaml.runCodeFormatter ?? true,
@@ -21,12 +22,12 @@ FeatureGenConfig mergeConfigs({
   );
 }
 
-String _makeOutputDir(FeatureGenIO io, String? parsed) {
+String _makeOutputDir(String rootDirectoryPath, String? parsed) {
   if (parsed != null) {
-    return join(io.getCwd(), parsed);
+    return join(rootDirectoryPath, parsed);
   }
 
-  return io.getCwd();
+  return rootDirectoryPath;
 }
 
 StateManagement _parseStateManagement(String? value) {

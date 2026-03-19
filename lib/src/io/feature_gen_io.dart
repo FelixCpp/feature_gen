@@ -18,8 +18,16 @@ class FeatureGenIO {
     return fileSystem.currentDirectory;
   }
 
-  File getFile(String path) {
+  File getFile(dynamic path) {
     return fileSystem.file(path);
+  }
+
+  Directory getDirectory(dynamic path) {
+    return fileSystem.directory(path);
+  }
+
+  Future<bool> doesFileExist(dynamic path) {
+    return fileSystem.isFile(path);
   }
 
   Future<void> createDirectory(String path) async {

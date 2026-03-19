@@ -20,7 +20,6 @@ void main() {
 
     test('should apply default values to non-parsed configs', () {
       final config = mergeConfigs(
-        io: io,
         cli: CliFeatureGenConfig(
           featureName: 'auth',
           featurePrefix: null,
@@ -36,6 +35,7 @@ void main() {
           runCodeFormatter: null,
           runCodeGenerator: null,
         ),
+        rootDirectoryPath: io.getCwd(),
       );
 
       expect(config.featureName, equals('auth'));
@@ -48,7 +48,6 @@ void main() {
 
     test('should merge feature prefix from yaml into cli', () {
       final config = mergeConfigs(
-        io: io,
         cli: CliFeatureGenConfig(
           featureName: 'auth',
           featurePrefix: null,
@@ -64,6 +63,7 @@ void main() {
           runCodeFormatter: null,
           runCodeGenerator: null,
         ),
+        rootDirectoryPath: io.getCwd(),
       );
 
       expect(config.featureName, equals('auth'));
@@ -76,7 +76,6 @@ void main() {
 
     test('should merge output directory from yaml into cli', () {
       final config = mergeConfigs(
-        io: io,
         cli: CliFeatureGenConfig(
           featureName: 'auth',
           featurePrefix: null,
@@ -92,6 +91,7 @@ void main() {
           runCodeFormatter: null,
           runCodeGenerator: null,
         ),
+        rootDirectoryPath: io.getCwd(),
       );
 
       expect(config.featureName, equals('auth'));
@@ -104,7 +104,6 @@ void main() {
 
     test('should merge state management from yaml into cli', () {
       final config = mergeConfigs(
-        io: io,
         cli: CliFeatureGenConfig(
           featureName: 'auth',
           featurePrefix: null,
@@ -120,6 +119,7 @@ void main() {
           runCodeFormatter: null,
           runCodeGenerator: null,
         ),
+        rootDirectoryPath: io.getCwd(),
       );
 
       expect(config.featureName, equals('auth'));
@@ -132,7 +132,6 @@ void main() {
 
     test('should merge run code formatter from yaml into cli', () {
       final config = mergeConfigs(
-        io: io,
         cli: CliFeatureGenConfig(
           featureName: 'auth',
           featurePrefix: null,
@@ -148,6 +147,7 @@ void main() {
           runCodeFormatter: false,
           runCodeGenerator: null,
         ),
+        rootDirectoryPath: io.getCwd(),
       );
 
       expect(config.featureName, equals('auth'));
@@ -160,7 +160,6 @@ void main() {
 
     test('should merge run code generator from yaml into cli', () {
       final config = mergeConfigs(
-        io: io,
         cli: CliFeatureGenConfig(
           featureName: 'auth',
           featurePrefix: null,
@@ -176,6 +175,7 @@ void main() {
           runCodeFormatter: null,
           runCodeGenerator: false,
         ),
+        rootDirectoryPath: io.getCwd(),
       );
 
       expect(config.featureName, equals('auth'));
@@ -199,7 +199,6 @@ void main() {
 
     test('takes feature prefix from cli instead of yaml', () {
       final config = mergeConfigs(
-        io: io,
         cli: CliFeatureGenConfig(
           featureName: 'auth',
           featurePrefix: 'cli_feat',
@@ -215,6 +214,7 @@ void main() {
           runCodeFormatter: null,
           runCodeGenerator: null,
         ),
+        rootDirectoryPath: io.getCwd(),
       );
 
       expect(config.featureName, equals('auth'));
@@ -227,7 +227,6 @@ void main() {
 
     test('takes output dir from cli instead of yaml', () {
       final config = mergeConfigs(
-        io: io,
         cli: CliFeatureGenConfig(
           featureName: 'auth',
           featurePrefix: null,
@@ -243,6 +242,7 @@ void main() {
           runCodeFormatter: null,
           runCodeGenerator: null,
         ),
+        rootDirectoryPath: io.getCwd(),
       );
 
       expect(config.featureName, equals('auth'));
@@ -255,7 +255,6 @@ void main() {
 
     test('takes state management from cli instead of yaml', () {
       final config = mergeConfigs(
-        io: io,
         cli: CliFeatureGenConfig(
           featureName: 'auth',
           featurePrefix: null,
@@ -271,6 +270,7 @@ void main() {
           runCodeFormatter: null,
           runCodeGenerator: null,
         ),
+        rootDirectoryPath: io.getCwd(),
       );
 
       expect(config.featureName, equals('auth'));
@@ -283,7 +283,6 @@ void main() {
 
     test('takes run code formatter from cli instead of yaml', () {
       final config = mergeConfigs(
-        io: io,
         cli: CliFeatureGenConfig(
           featureName: 'auth',
           featurePrefix: null,
@@ -299,6 +298,7 @@ void main() {
           runCodeFormatter: true,
           runCodeGenerator: null,
         ),
+        rootDirectoryPath: io.getCwd(),
       );
 
       expect(config.featureName, equals('auth'));
@@ -311,7 +311,6 @@ void main() {
 
     test('takes run code generator from cli instead of yaml', () {
       final config = mergeConfigs(
-        io: io,
         cli: CliFeatureGenConfig(
           featureName: 'auth',
           featurePrefix: null,
@@ -327,6 +326,7 @@ void main() {
           runCodeFormatter: null,
           runCodeGenerator: true,
         ),
+        rootDirectoryPath: io.getCwd(),
       );
 
       expect(config.featureName, equals('auth'));

@@ -220,3 +220,5 @@ dart test
 - **Dart SDK** `>=3.0.0`
 - **Dart/Flutter project** with a `pubspec.yaml` in the working directory
 - `build_runner` and `freezed` in your Flutter project's `dev_dependencies` (only required if you want the build step)
+- **flutter_bloc** in case you generate using bloc or cubit as state management
+- **flutter_riverpod**, **riverpod_annotation**, **riverpod_generator** in case you generate using riverpod as state management
