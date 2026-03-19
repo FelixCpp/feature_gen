@@ -2,7 +2,7 @@
 
 [![pub package](https://img.shields.io/pub/v/dart_feature_gen.svg)](https://pub.dev/packages/dart_feature_gen)
 [![codecov](https://codecov.io/gh/FelixCpp/dart_feature_gen/branch/main/graph/badge.svg)](https://codecov.io/gh/FelixCpp/dart_feature_gen)
-[![CI](https://github.com/FelixCpp/dart_feature_gen/actions/workflows/ci.yml/badge.svg)](https://github.com/FelixCpp/dart_feature_gen)
+[![CI](https://github.com/FelixCpp/dart_feature_gen/actions/workflows/ci.yaml/badge.svg)](https://github.com/FelixCpp/dart_feature_gen)
 
 ---
 
