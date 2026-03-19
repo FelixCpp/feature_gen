@@ -3,6 +3,7 @@ import 'package:dart_feature_gen/src/utility/find_nearest_file.dart';
 import 'package:file/memory.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:test/test.dart';
+import 'package:path/path.dart' as path;
 
 void main() {
   group('find root directory', () {
@@ -23,7 +24,7 @@ void main() {
       );
 
       expect(pubspecFile, isNotNull);
-      expect(pubspecFile?.path, equals('root/pubspec.yaml'));
+      expect(pubspecFile?.path, equals(path.join('root', 'pubspec.yaml')));
     });
 
     test('should not find root directory due to missing file', () async {
@@ -32,7 +33,7 @@ void main() {
       final io = FeatureGenIO(fileSystem: fileSystem, logger: logger);
 
       final startingDirectory = await fileSystem
-          .directory('root/level1/level2')
+          .directory(path.join('root', 'level1', 'level2'))
           .create(recursive: true);
 
       final dir = await findNearestFile(
