@@ -2,10 +2,11 @@ import 'package:dart_feature_gen/src/feature_gen_config.dart';
 import 'package:dart_feature_gen/src/generators/domain_generator.dart';
 import 'package:dart_feature_gen/src/io/feature_gen_io.dart';
 import 'package:file/file.dart';
-import 'package:file/memory.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:test/test.dart';
 import 'package:path/path.dart' as path;
+
+import 'memory_file_system.dart';
 
 void main() {
   group(DomainGenerator, () {
@@ -14,7 +15,7 @@ void main() {
 
     setUp(() {
       final logger = Logger(level: Level.quiet);
-      fileSystem = MemoryFileSystem.test();
+      fileSystem = getTestFileSystem();
       generator = DomainGenerator(
         logger: logger,
         io: FeatureGenIO(

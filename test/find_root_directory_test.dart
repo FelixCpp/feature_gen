@@ -1,14 +1,15 @@
 import 'package:dart_feature_gen/src/io/feature_gen_io.dart';
 import 'package:dart_feature_gen/src/utility/find_nearest_file.dart';
-import 'package:file/memory.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:test/test.dart';
 import 'package:path/path.dart' as path;
 
+import 'memory_file_system.dart';
+
 void main() {
   group('find root directory', () {
     test('should find root directory', () async {
-      final fileSystem = MemoryFileSystem.test();
+      final fileSystem = getTestFileSystem();
       final logger = Logger(level: Level.quiet);
       final io = FeatureGenIO(fileSystem: fileSystem, logger: logger);
 
@@ -31,7 +32,7 @@ void main() {
     });
 
     test('should not find root directory due to missing file', () async {
-      final fileSystem = MemoryFileSystem.test();
+      final fileSystem = getTestFileSystem();
       final logger = Logger(level: Level.quiet);
       final io = FeatureGenIO(fileSystem: fileSystem, logger: logger);
 

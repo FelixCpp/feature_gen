@@ -3,9 +3,10 @@ import 'package:dart_feature_gen/src/config_parser.dart';
 import 'package:dart_feature_gen/src/feature_gen_config.dart';
 import 'package:dart_feature_gen/src/io/feature_gen_io.dart';
 import 'package:dart_feature_gen/src/yaml/yaml_feature_gen_config.dart';
-import 'package:file/memory.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:test/test.dart';
+
+import 'memory_file_system.dart';
 
 void main() {
   group('merges yaml into cli', () {
@@ -13,7 +14,7 @@ void main() {
 
     setUp(() {
       io = FeatureGenIO(
-        fileSystem: MemoryFileSystem.test(),
+        fileSystem: getTestFileSystem(),
         logger: Logger(level: Level.quiet),
       );
     });
@@ -192,7 +193,7 @@ void main() {
 
     setUp(() {
       io = FeatureGenIO(
-        fileSystem: MemoryFileSystem.test(),
+        fileSystem: getTestFileSystem(),
         logger: Logger(level: Level.quiet),
       );
     });

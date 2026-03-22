@@ -1,15 +1,16 @@
 import 'package:dart_feature_gen/src/io/feature_gen_io.dart';
 import 'package:dart_feature_gen/src/yaml/yaml_config_loader.dart';
-import 'package:file/memory.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:test/test.dart';
+
+import 'memory_file_system.dart';
 
 void main() {
   group('YamlLoader', () {
     late YamlConfigLoader yamlLoader;
     setUp(() {
       final logger = Logger(level: Level.quiet);
-      final fileSystem = MemoryFileSystem.test();
+      final fileSystem = getTestFileSystem();
 
       yamlLoader = YamlConfigLoader(
         io: FeatureGenIO(fileSystem: fileSystem, logger: logger),
