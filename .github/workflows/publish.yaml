@@ -1,114 +1,16 @@
 name: Publish
 
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: "Version to release (e.g. 1.2.3 — without leading v)"
-        required: true
-        type: string
+  push:
+    tags:
+      - "v*" # Wird durch release.yml getriggert wenn der Tag gepusht wird
 
 jobs:
   # ─────────────────────────────────────────────
-  # 1. Eingabe validieren & gegen pubspec prüfen
-  # ─────────────────────────────────────────────
-  verify:
-    name: Verify version & pubspec
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Validate version format (X.Y.Z)
-        run: |
-          VERSION="${{ github.event.inputs.version }}"
-          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "❌ '$VERSION' ist kein gültiges Format — erwartet: X.Y.Z (z.B. 1.2.3)"
-            exit 1
-          fi
-          echo "✅ Format OK: $VERSION"
-
-      - name: Check pubspec.yaml version matches input
-        run: |
-          VERSION="${{ github.event.inputs.version }}"
-          PUBSPEC_VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//')
-          if [[ "$VERSION" != "$PUBSPEC_VERSION" ]]; then
-            echo "❌ Eingabe '$VERSION' ≠ pubspec.yaml '$PUBSPEC_VERSION'"
-            echo "   Bitte zuerst pubspec.yaml anpassen und committen."
-            exit 1
-          fi
-          echo "✅ Versionen stimmen überein: $VERSION"
-
-  # ─────────────────────────────────────────────
-  # 2. Changelog generieren, committen & pushen,
-  #    Tag auf neuen Commit setzen, Release anlegen
-  # ─────────────────────────────────────────────
-  release:
-    name: Create changelog, tag & GitHub Release
-    needs: verify
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: write # Nötig für Commit, Push, Tag und Release
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # git-cliff braucht die vollständige Commit-History
-          # Wichtig: Mit dem Standard-GITHUB_TOKEN kann ein Push aus einem
-          # Workflow keinen neuen Workflow-Run auf dem Branch triggern.
-          # Falls du das brauchst, ersetze dies durch einen PAT:
-          # token: ${{ secrets.PAT }}
-
-      # Ersetzt orhun/git-cliff-action um den OUTPUT/--prepend Konflikt zu vermeiden
-      - name: Install git-cliff
-        uses: taiki-e/install-action@v2
-        with:
-          tool: git-cliff
-
-      - name: Generate changelog with git-cliff
-        run: git cliff --unreleased --tag "v${{ github.event.inputs.version }}" --prepend CHANGELOG.md
-        env:
-          # --unreleased  → alle Commits seit dem letzten Tag
-          # --tag         → git-cliff kennt den neuen Tag-Namen bereits für den Header
-          # --prepend     → neuen Eintrag oben einfügen, Rest bleibt erhalten
-          GITHUB_REPO: ${{ github.repository }}
-
-      - name: Commit & push CHANGELOG.md
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add CHANGELOG.md
-          git commit -m "chore(release): update changelog for v${{ github.event.inputs.version }} [skip ci]"
-          git push origin HEAD
-          # [skip ci] verhindert dass der CI-Workflow durch diesen Commit getriggert wird
-
-      - name: Create and push tag (auf dem neuen Commit)
-        run: |
-          VERSION="v${{ github.event.inputs.version }}"
-          git tag "$VERSION" -m "Release $VERSION"
-          git push origin "$VERSION"
-
-      - name: Generate release notes (nur dieser Release, kein Header)
-        run: git cliff --latest --strip header > /tmp/release-notes.md
-        env:
-          # --latest      → nur Commits dieses Releases
-          # --strip header → kein Titel im Release-Body
-          GITHUB_REPO: ${{ github.repository }}
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: "v${{ github.event.inputs.version }}"
-          name: "v${{ github.event.inputs.version }}"
-          body_path: /tmp/release-notes.md
-
-  # ─────────────────────────────────────────────
-  # 3. Auf pub.dev veröffentlichen
+  # Auf pub.dev veröffentlichen
   # ─────────────────────────────────────────────
   publish:
     name: Publish to pub.dev
-    needs: release
     runs-on: ubuntu-latest
 
     # Notwendig für OIDC-basierte pub.dev-Authentifizierung
@@ -119,9 +21,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: "v${{ github.event.inputs.version }}"
-          # Wichtig: Checkout des Tags, damit der aktuelle CHANGELOG.md
-          # (der im release-Job committet wurde) enthalten ist
+          ref: ${{ github.ref }}
+          # Checkout des Tags, damit der aktuelle CHANGELOG.md enthalten ist
 
       - uses: dart-lang/setup-dart@v1
         with:
