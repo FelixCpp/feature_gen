@@ -54,11 +54,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # git-cliff braucht die vollständige Commit-History
-          # Wichtig: Mit dem Standard-GITHUB_TOKEN kann ein Push aus einem
-          # Workflow keinen neuen Workflow-Run auf dem Branch triggern.
-          # Falls du das brauchst, ersetze dies durch einen PAT:
-          # token: ${{ secrets.PAT }}
+          fetch-depth: 0
+          token: ${{ secrets.RELEASE_PAT }}
 
       - name: Install git-cliff
         uses: taiki-e/install-action@v2
