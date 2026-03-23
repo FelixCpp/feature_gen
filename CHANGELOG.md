@@ -3,58 +3,6 @@
 All notable changes to this project will be documented in this file.
 Versions follow [Semantic Versioning](https://semver.org).
 
-## [1.2.0] - 2026-03-22
-
-### Bug Fixes
-
-- Fix: replace single-job publish workflow with two-job approach for pub.dev OIDC compliance ([`4f3adf1`](4f3adf1e63b486a061aaf751684dfe9ecd8a9547))
-- Fix: replace single-job publish workflow with two-job approach for pub.dev OIDC compliance ([`c3e49d1`](c3e49d125a793470ae0cc56117702a4cbc00d444))
-- Fix readme, added riverpod documentation ([`77e079f`](77e079f103c1a0641e0b6f9d968a1763cfdd179c))
-- Fix code structure in main.dart ([`40814a5`](40814a5750d90f5fb9796cdd67614bd8923c22f2))
-- Fix readme badge ([`5d35122`](5d351226d1e26b08c7afc353ca46133e86d24010))
-- Fix badge link ([`3472fab`](3472fabd323435a3e1b66bb9dc9984c416bd77c9))
-- Fix test paths for windows platform ([`f8db3a9`](f8db3a9e76ea46de8e0c0d3ecdf595c998999fca))
-- Fixed MemoryFileSystem FileSystemStyle to work on Windows platform ([`c150ae9`](c150ae9ba84dbf086760c210c34edd8cd39d8bd3))
-
-### Other
-
-- Initial plan ([`15e2742`](15e274247f97f14293b30e521f695c885beb00cf))
-- Merge pull request #12 from FelixCpp/copilot/setup-ci-cd-process ([`d0e3120`](d0e312060180bf1b109a79740c3b1373489edd28))
-- Initial plan ([`ce5e7d0`](ce5e7d02ad5e7d15af7457d15bbe2d19d89b4e5f))
-- Merge pull request #12 from FelixCpp/copilot/setup-ci-cd-process ([`2f8939a`](2f8939a5d94293ba70b2360132cc5058126afd6f))
-- Merge branch 'develop' of github.com:FelixCpp/dart_feature_gen into develop ([`9179fa2`](9179fa20728103d37e8d167bf1698fe57bc1ba36))
-- Added riverpod state-management library ([`fa10da7`](fa10da71a398176dfb2689c6428bd9118d17e7a1))
-- Merge pull request #14 from FelixCpp/feat/riverpod ([`99c4acd`](99c4acd4ddc3d435449c97a3035bb51b60afa104))
-- Merge pull request #13 from FelixCpp/develop ([`cbe9c9e`](cbe9c9ea126497797c71e2bd6607dbbab9fb03e1))
-- Revert "refactor yaml config loader" ([`f875e38`](f875e382bcc239927146502b7cb76da771ba0c60))
-- New workflow added ([`dbee983`](dbee983e4aaea45596b8200184eebac657affb68))
-- Merge pull request #15 from FelixCpp/fix/pipeline ([`0d790ed`](0d790ed996c87ab68eca42996c9fa7ef85ec8be2))
-- Traverse directories searching for root config file ([`5b676a6`](5b676a6dbc6171bcd021e540587c398b3de4fd94))
-- Merge branch 'fix/find_config_file' of github.com:FelixCpp/dart_feature_gen into fix/find_config_file ([`066827e`](066827ea94ada1074d410cded35c4753b8bd1aac))
-- Readme update ([`095f2b0`](095f2b09f186b5e07be2fbc2324d21a9985b79ec))
-- Add codecov ignoring list ([`2cdbe65`](2cdbe659d5a2c9d5292daaf5c62203e6ffb9e6f2))
-- Merge pull request #16 from FelixCpp/fix/find_config_file ([`cc10889`](cc1088956bed65d51cba9f01df621098a9bd8ab8))
-- Merge pull request #17 from FelixCpp/fix/find_config_file ([`fc50ea0`](fc50ea05d40a236d1e50dc31d9c6da1e972d06ce))
-- Another fix for windows ([`fa75981`](fa7598137f00e0f6450870e577dbc275b0383678))
-- Windows stuff i guess ([`d6941bc`](d6941bc51c2404f78f642d11e60b24f04b46c028))
-- Merge pull request #18 from FelixCpp/develop ([`1c86b7e`](1c86b7e5b915d7f98b5b87b053f1a179a9ae4f45))
-- Merge pull request #19 from FelixCpp/main ([`bff4b44`](bff4b44f77100db494827d8b1b91bfbb732887e0))
-- Merge pull request #20 from FelixCpp/develop ([`ab28b91`](ab28b91b88630c478a7fe3962a82d6a945ff29de))
-- Version update ([`4e0cf58`](4e0cf584721860e7d79d1b6f4b1e97ba4f6e8458))
-- Prepend changelog ([`b1f7760`](b1f7760891bd73d9e4f2a9d2c9f918beb154dfa5))
-- Typo fix ([`3c2aa84`](3c2aa8414f0d155b068533c2485bb28253c1ede9))
-- No output for now ([`5699fea`](5699feae333629d62d24bb2434b9abaa408b193e))
-- Changelog cleanup ([`d7857c4`](d7857c40fe9c72c5711b20cf2671b1f4ba61124d))
-- Publish workflow ([`3b9b76c`](3b9b76c2c88593503942a30c646d92dfca316e8a))
-- CI ([`f98ffe0`](f98ffe09d53378d74bffe20cada253e6756df383))
-- Changelog ([`c934780`](c934780a61a0f21f124df9cd6e0b7bcab13703c1))
-- Release job you know ([`a4ef804`](a4ef80431dd0f4cf2040e8fc1c75626d5be997bd))
-
-### Refactoring
-
-- Refactor yaml config loader ([`0beb037`](0beb03720423c0fe91db01c9aecb957be0c7e330))
-- Refactor yaml config loader ([`5bfa808`](5bfa808f81a6618bcf4297228f440dc4e3947559))
-
 ## [1.1.0] - 2026-03-18
 
 ### Bug Fixes
