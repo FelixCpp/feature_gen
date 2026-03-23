@@ -199,6 +199,14 @@ jobs:
       - name: Install dependencies
         run: dart pub get
 
+      # dart pub get writes .dart_tool/package_config.json (and may touch
+      # pubspec.lock). dart pub publish runs `git status` internally and
+      # refuses to publish if the working tree is dirty. We reset any
+      # changes introduced by pub get so the tree is clean again.
+      # The files are NOT needed at runtime by pub.dev – only the sources are.
+      - name: Reset working tree after pub get
+        run: git checkout -- .
+
       # ── 4. Publish to pub.dev via OIDC ────────────────────────
       #    dart-lang/setup-dart + id-token: write handles auth.
       #    No PUB_TOKEN secret required.
