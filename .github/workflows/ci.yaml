@@ -45,19 +45,19 @@ jobs:
       - name: Analyze
         run: dart analyze --fatal-infos
 
-      - name: Run tests
-        run: dart test --coverage=coverage
-
       - name: Install coverage tools
         run: dart pub global activate coverage
 
-      - name: Convert coverage to LCOV
-        run: dart pub global run coverage:format_coverage \
-          --lcov \
-          --in=coverage \
-          --out=coverage/lcov.info \
-          --packages=.dart_tool/package_config.json \
-          --report-on=lib
+      # dart test --coverage only instruments code loaded via package: URIs (lib/).
+      # For CLI tools with a bin/ entrypoint the collector finds no .json files.
+      # Instead we drive the VM directly with --coverage so every loaded library
+      # (including bin/ and lib/) is instrumented.
+      - name: Run tests with coverage
+        run: |
+          dart pub global run coverage:test_with_coverage \
+            --function-coverage \
+            --branch-coverage \
+            -- --reporter=expanded
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
