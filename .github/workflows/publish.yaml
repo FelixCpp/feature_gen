@@ -1,0 +1,74 @@
+name: Publish
+
+# Triggered automatically when release.yml pushes a vX.Y.Z tag.
+# Because the trigger is `push: tags`, GitHub sets refType=tag in the
+# OIDC token – which is exactly what pub.dev requires for publishing.
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+permissions:
+  contents: write # Create GitHub Release
+  id-token: write # OIDC token for pub.dev (requires refType: tag)
+
+jobs:
+  publish:
+    name: Publish to pub.dev & Create GitHub Release
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Checkout the exact tagged commit ───────────────────
+      #    The tag was pushed by release.yml and already contains
+      #    the updated pubspec.yaml and CHANGELOG.md.
+      - name: Checkout ${{ github.ref_name }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }} # e.g. refs/tags/v1.2.3
+          fetch-depth: 0
+
+      # ── 2. Tooling ────────────────────────────────────────────
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install git-cliff
+        uses: taiki-e/install-action@v2
+        with:
+          tool: git-cliff
+
+      # ── 3. Install dependencies ───────────────────────────────
+      - name: Install dependencies
+        run: dart pub get
+
+      # ── 4. Publish to pub.dev via OIDC ────────────────────────
+      #    dart-lang/setup-dart exchanges the OIDC token with pub.dev.
+      #    No PUB_TOKEN secret required.
+      #    pub.dev accepts this because refType=tag (from the push trigger).
+      - name: Publish to pub.dev
+        run: dart pub publish --force
+
+      # ── 5. Extract release notes for this tag ─────────────────
+      - name: Extract release notes
+        id: release_notes
+        run: |
+          NOTES=$(git-cliff \
+            --config cliff.toml \
+            --latest \
+            --strip header)
+          echo "notes<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$NOTES"     >> "$GITHUB_OUTPUT"
+          echo "EOF"        >> "$GITHUB_OUTPUT"
+
+      # ── 6. Create GitHub Release ──────────────────────────────
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          body: ${{ steps.release_notes.outputs.notes }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_PAT }}

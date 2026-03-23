@@ -1,4 +1,4 @@
-name: Release & Publish
+name: Release
 
 on:
   workflow_dispatch:
@@ -13,26 +13,18 @@ on:
         default: true
         type: boolean
       dry_run:
-        description: "Dry run (no publish, no push, no tag)"
+        description: "Dry run (no push, no tag)"
         required: false
         default: false
         type: boolean
 
 permissions:
-  contents: write # Create commits, tags, releases
-  id-token: write # OIDC token for pub.dev
+  contents: write # Create commits & tags
 
 jobs:
-  # ════════════════════════════════════════════════════════════
-  # JOB 1 – Prepare: validate, bump, changelog, commit & push
-  # ════════════════════════════════════════════════════════════
   prepare:
     name: Prepare Release
     runs-on: ubuntu-latest
-
-    outputs:
-      version: ${{ steps.validate.outputs.version }}
-      tag: ${{ steps.validate.outputs.tag }}
 
     steps:
       # ── 1. Checkout (full history for git-cliff) ──────────────
@@ -67,11 +59,8 @@ jobs:
         id: validate
         run: |
           INPUT="${{ github.event.inputs.version }}"
-
-          # Strip accidental leading 'v'
           VERSION="${INPUT#v}"
 
-          # Must be strict SemVer x.y.z
           if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
             echo "::error::Input version '$VERSION' is not valid SemVer (x.y.z)."
             exit 1
@@ -86,17 +75,13 @@ jobs:
 
           if [ "$VERSION" != "$PUBSPEC_VERSION" ]; then
             echo "::warning::Version mismatch – input '$VERSION' vs pubspec '$PUBSPEC_VERSION'."
-
             if [ "${{ github.event.inputs.fix_pubspec }}" = "true" ]; then
               echo "Auto-fixing pubspec.yaml to $VERSION ..."
               yq -i ".version = \"$VERSION\"" pubspec.yaml
-              echo "pubspec_updated=true" >> "$GITHUB_OUTPUT"
             else
               echo "::error::Version mismatch and fix_pubspec=false. Aborting."
               exit 1
             fi
-          else
-            echo "pubspec_updated=false" >> "$GITHUB_OUTPUT"
           fi
 
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
@@ -123,16 +108,17 @@ jobs:
       - name: Run tests
         run: dart test
 
-      # ── 7. Commit & push (pubspec + CHANGELOG) ────────────────
-      #    Must happen BEFORE --dry-run: dart pub publish checks
-      #    `git status` and fails when tracked files are modified.
+      # ── 7. Commit & push ──────────────────────────────────────
+      #    Commit BEFORE --dry-run so the working tree is clean.
+      #    dart pub publish --dry-run runs `git status` internally
+      #    and fails when tracked files are modified.
       #    [skip ci] prevents the CI workflow from re-triggering.
       - name: Commit release changes
         if: ${{ github.event.inputs.dry_run == 'false' }}
         run: |
           git add pubspec.yaml CHANGELOG.md
           if git diff --cached --quiet; then
-            echo "Nothing to commit – pubspec and CHANGELOG were already up to date."
+            echo "Nothing to commit – already up to date."
           else
             git commit -m "chore(release): ${{ steps.validate.outputs.version }} [skip ci]"
           fi
@@ -144,10 +130,11 @@ jobs:
             -m "Release ${{ steps.validate.outputs.tag }}"
           git push origin HEAD
           git push origin "${{ steps.validate.outputs.tag }}"
+          # Pushing this tag automatically triggers publish.yml via
+          # `on: push: tags: ['v*.*.*']` – which receives refType: tag
+          # in its OIDC token, satisfying pub.dev's publishing policy.
 
-      # ── 8. Validate package (tree is now clean after commit) ──
-      #    pubspec.yaml and CHANGELOG.md are committed → git status
-      #    is clean → dry-run passes without "modified files" warning.
+      # ── 8. pub.dev dry-run (tree is clean after commit) ───────
       - name: dart pub publish --dry-run
         run: dart pub publish --dry-run
 
@@ -156,84 +143,10 @@ jobs:
         if: ${{ github.event.inputs.dry_run == 'true' }}
         run: |
           echo "## Dry Run Summary" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Field   | Value |"  >> "$GITHUB_STEP_SUMMARY"
-          echo "| ------- | ----- |"  >> "$GITHUB_STEP_SUMMARY"
+          echo "| Field | Value |"  >> "$GITHUB_STEP_SUMMARY"
+          echo "| ----- | ----- |"  >> "$GITHUB_STEP_SUMMARY"
           echo "| Version | \`${{ steps.validate.outputs.version }}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Tag     | \`${{ steps.validate.outputs.tag }}\` |"     >> "$GITHUB_STEP_SUMMARY"
-          echo "| pubspec auto-fixed | ${{ steps.validate.outputs.pubspec_updated }} |" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "### CHANGELOG preview (first 60 lines)" >> "$GITHUB_STEP_SUMMARY"
           head -60 CHANGELOG.md >> "$GITHUB_STEP_SUMMARY"
-
-  # ════════════════════════════════════════════════════════════
-  # JOB 2 – Publish: runs AFTER prepare has pushed the tag.
-  #          Checks out the tagged commit → pub.dev sees the
-  #          updated CHANGELOG and pubspec.yaml.
-  # ════════════════════════════════════════════════════════════
-  publish:
-    name: Publish to pub.dev & Create Release
-    runs-on: ubuntu-latest
-    needs: prepare
-    if: ${{ github.event.inputs.dry_run == 'false' }}
-
-    steps:
-      # ── 1. Checkout the exact tagged commit ───────────────────
-      - name: Checkout tag ${{ needs.prepare.outputs.tag }}
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.prepare.outputs.tag }}
-          token: ${{ secrets.RELEASE_PAT }}
-
-      # ── 2. Tooling ────────────────────────────────────────────
-      - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@v1
-        with:
-          sdk: stable
-
-      - name: Install git-cliff
-        uses: taiki-e/install-action@v2
-        with:
-          tool: git-cliff
-
-      # ── 3. Install dependencies ───────────────────────────────
-      - name: Install dependencies
-        run: dart pub get
-
-      # dart pub get writes .dart_tool/package_config.json (and may touch
-      # pubspec.lock). dart pub publish runs `git status` internally and
-      # refuses to publish if the working tree is dirty. We reset any
-      # changes introduced by pub get so the tree is clean again.
-      # The files are NOT needed at runtime by pub.dev – only the sources are.
-      - name: Reset working tree after pub get
-        run: git checkout -- .
-
-      # ── 4. Publish to pub.dev via OIDC ────────────────────────
-      #    dart-lang/setup-dart + id-token: write handles auth.
-      #    No PUB_TOKEN secret required.
-      - name: Publish to pub.dev
-        run: dart pub publish --force
-
-      # ── 5. Extract release notes for this version only ────────
-      - name: Extract release notes
-        id: release_notes
-        run: |
-          NOTES=$(git-cliff \
-            --config cliff.toml \
-            --tag "${{ needs.prepare.outputs.tag }}" \
-            --unreleased \
-            --strip header)
-          echo "notes<<EOF" >> "$GITHUB_OUTPUT"
-          echo "$NOTES"     >> "$GITHUB_OUTPUT"
-          echo "EOF"        >> "$GITHUB_OUTPUT"
-
-      # ── 6. Create GitHub Release ──────────────────────────────
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ needs.prepare.outputs.tag }}
-          name: ${{ needs.prepare.outputs.tag }}
-          body: ${{ steps.release_notes.outputs.notes }}
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_PAT }}
