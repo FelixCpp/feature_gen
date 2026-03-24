@@ -1,0 +1,155 @@
+# .github/workflows/publish.yml
+#
+# Publish Workflow – pub.dev via OIDC (manual trigger)
+#
+# Triggered manually with an existing Git tag as input.
+# Guards:
+#   1. Verifies the tag exists and matches the pubspec.yaml version at that tag.
+#   2. Runs pana (the same tool pub.dev uses internally) and enforces a minimum
+#      score before publishing – catching issues before they go public.
+#   3. Publishes to pub.dev using the official Dart OIDC flow.
+#
+# One-time setup (only needed once per repository)
+# ─────────────────────────────────────────────────
+#   1. Publish the very first version manually from your machine:
+#        dart pub publish
+#   2. pub.dev → your package → Admin → Automated publishing:
+#        • Enable GitHub Actions publishing
+#        • Repository  : <owner>/<repo>
+#        • Tag pattern : v{{version}}   ← must match tags from release.yml
+#        • Environment : pub.dev        ← must match the environment below
+#   3. GitHub → repo → Settings → Environments → create "pub.dev"
+#      (add required-reviewer protection if you want an approval gate)
+#
+# Required secrets / permissions
+# ────────────────────────────────
+#   id-token: write  – granted below, required for OIDC exchange with pub.dev
+#   No additional secrets needed – OIDC is token-based.
+
+name: Publish to pub.dev
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to publish (must already exist, e.g. v1.2.3)"
+        required: true
+        type: string
+      min_pub_score:
+        description: "Minimum pana score to allow publishing (0–160, default 120)"
+        required: false
+        default: "120"
+        type: string
+
+jobs:
+  # ── Guard: validate tag & score ───────────────────────────────────────────
+  validate:
+    name: Validate tag & pana score
+    runs-on: ubuntu-latest
+
+    outputs:
+      tag: ${{ steps.parse.outputs.tag }}
+      version: ${{ steps.parse.outputs.version }}
+
+    steps:
+      - name: Parse and normalise tag input
+        id: parse
+        run: |
+          TAG="${{ github.event.inputs.tag }}"
+          # Ensure tag starts with 'v'
+          [[ "$TAG" != v* ]] && TAG="v$TAG"
+          VERSION="${TAG#v}"
+          echo "tag=$TAG"         >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Resolved tag: $TAG  version: $VERSION"
+
+      - name: Checkout at the given tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.parse.outputs.tag }}
+          fetch-depth: 0
+
+      - name: Verify tag exists in remote
+        run: |
+          TAG="${{ steps.parse.outputs.tag }}"
+          if ! git rev-parse --verify "refs/tags/$TAG" &>/dev/null; then
+            echo "❌ Tag '$TAG' does not exist in this repository."
+            exit 1
+          fi
+          echo "✅ Tag $TAG exists."
+
+      - name: Verify pubspec.yaml version matches tag
+        run: |
+          TAG_VERSION="${{ steps.parse.outputs.version }}"
+          PUBSPEC_VERSION=$(grep -m1 '^version:' pubspec.yaml | sed 's/version:[[:space:]]*//')
+          echo "Tag version    : $TAG_VERSION"
+          echo "pubspec version: $PUBSPEC_VERSION"
+          if [ "$TAG_VERSION" != "$PUBSPEC_VERSION" ]; then
+            echo "❌ Version mismatch: tag says $TAG_VERSION but pubspec.yaml says $PUBSPEC_VERSION."
+            echo "   Make sure you're publishing the correct tag."
+            exit 1
+          fi
+          echo "✅ Versions match."
+
+      - name: Set up Dart SDK
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install dependencies
+        run: dart pub get
+
+      # ── pana score guard ──────────────────────────────────────────────────
+      # pana is the tool pub.dev uses to compute the pub score.
+      # Running it locally gives an early signal before the package goes live.
+      - name: Activate pana
+        run: dart pub global activate pana
+
+      - name: Run pana and check score
+        run: |
+          MIN_SCORE="${{ github.event.inputs.min_pub_score }}"
+          echo "Minimum required score: $MIN_SCORE / 160"
+          echo ""
+
+          # Run pana and capture JSON output
+          PANA_JSON=$(dart pub global run pana --json --no-warning . 2>/dev/null || true)
+
+          # Extract the total granted points
+          SCORE=$(echo "$PANA_JSON" | python3 -c "
+          import sys, json
+          try:
+              data = json.load(sys.stdin)
+              granted = data.get('scores', {}).get('grantedPoints', 0)
+              total   = data.get('scores', {}).get('maxPoints', 130)
+              print(f'{granted}/{total}')
+              sys.exit(0 if granted >= int('$MIN_SCORE') else 1)
+          except Exception as e:
+              print(f'Could not parse pana output: {e}', file=sys.stderr)
+              sys.exit(1)
+          ")
+
+          echo "pana score: $SCORE"
+
+          if [ $? -ne 0 ]; then
+            echo "❌ pana score is below the required minimum of $MIN_SCORE/130."
+            echo "   Fix the issues reported by pana before publishing."
+            exit 1
+          fi
+          echo "✅ pana score meets the minimum threshold."
+
+  # ── Publish to pub.dev via OIDC ───────────────────────────────────────────
+  publish:
+    name: Publish to pub.dev
+    needs: validate
+    environment: pub.dev # must match the environment name on pub.dev
+
+    permissions:
+      id-token: write # required for OIDC token exchange with pub.dev
+
+    # The official reusable Dart publishing workflow handles:
+    #   • dart pub get
+    #   • dart pub publish --force
+    #   • OIDC token exchange
+    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
+    with:
+      environment: pub.dev

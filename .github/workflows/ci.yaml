@@ -2,8 +2,13 @@
 #
 # CI Workflow – Build · Test · Analyze
 #
-# Runs on every push and pull-request.
-# Test results are uploaded to Codecov.
+# Runs on every push, regardless of branch.
+# Tests run in parallel on Ubuntu, Windows and macOS.
+# Coverage is collected on Ubuntu only and uploaded to Codecov.
+#
+# Required secrets
+# ────────────────
+#   CODECOV_TOKEN – token from codecov.io for your repository
 
 name: CI
 
@@ -14,47 +19,86 @@ on:
     branches: ["**"]
 
 jobs:
-  ci:
-    name: Build · Test · Analyze
+  # ── Static analysis & formatting (fast, Ubuntu only) ──────────────────────
+  analyze:
+    name: Analyze & Format
     runs-on: ubuntu-latest
 
     steps:
-      # ── Checkout ──────────────────────────────────────────────────────────
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ── Dart SDK ──────────────────────────────────────────────────────────
       - name: Set up Dart SDK
         uses: dart-lang/setup-dart@v1
         with:
           sdk: stable
 
-      # ── Dependencies ──────────────────────────────────────────────────────
       - name: Install dependencies
         run: dart pub get
 
-      # ── Static analysis ───────────────────────────────────────────────────
-      - name: Analyze code (dart analyze)
+      - name: Analyze code
         run: dart analyze --fatal-infos
 
-      # ── Formatting ────────────────────────────────────────────────────────
-      - name: Check formatting (dart format)
+      - name: Check formatting
         run: dart format --output=none --set-exit-if-changed .
 
-      # ── Tests with coverage ───────────────────────────────────────────────
+      - name: Show outdated dependencies (informational)
+        run: dart pub outdated
+        continue-on-error: true # never blocks the build, just informational
+
+  # ── Tests (matrix: Ubuntu · Windows · macOS) ──────────────────────────────
+  test:
+    name: Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    needs: analyze
+
+    strategy:
+      fail-fast: false # run all platforms even if one fails
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Dart SDK
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Run tests
+        run: dart test
+
+  # ── Coverage (Ubuntu only, runs after all tests pass) ─────────────────────
+  coverage:
+    name: Coverage → Codecov
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Dart SDK
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install dependencies
+        run: dart pub get
+
       - name: Run tests with coverage
         run: dart test --coverage=coverage
 
-      # ── Convert to lcov ───────────────────────────────────────────────────
-      # We activate the coverage package globally so it does not need to be
-      # listed as a direct dependency in pubspec.yaml.
-      - name: Activate coverage tool
+      - name: Activate coverage tool (global, no pubspec change needed)
         run: dart pub global activate coverage
 
       - name: Convert coverage to lcov
         run: dart pub global run coverage:format_coverage --lcov --in=coverage --out=coverage/lcov.info --report-on=lib
 
-      # ── Upload to Codecov ─────────────────────────────────────────────────
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
