@@ -1,205 +1,123 @@
-# .github/workflows/release.yml
-#
-# Release Workflow
-#
-# Triggered manually (workflow_dispatch) with a SemVer version string.
-#
-# Steps
-# ─────
-#  1.  Checkout & set up Dart
-#  2.  Validate the requested version (SemVer)
-#  3.  Sync pubspec.yaml version with the requested version (if different)
-#  4.  Generate / update CHANGELOG.md with git-cliff
-#  5.  Commit & push the version + changelog changes  ← must happen BEFORE tag
-#  6.  Create and push the SemVer tag  (v<version>)   ← triggers the publish job
-#  7.  Create a GitHub Release (with changelog as body)
-#
-# The actual pub.dev publish is handled by the separate `publish.yml` workflow
-# which is triggered by the tag push above.  pub.dev's OIDC policy requires
-# that the publishing workflow is triggered by a tag push – it cannot be
-# triggered by workflow_dispatch or workflow_call from a branch-triggered run.
-#
-# Required secrets / variables
-# ────────────────────────────
-#  RELEASE_PAT  – a Personal Access Token (or fine-grained token) with
-#                 contents:write scope.
-#                 (The default GITHUB_TOKEN cannot push commits/tags that
-#                  trigger other workflows.  If this secret is absent the tag
-#                  push silently uses GITHUB_TOKEN, publish.yaml never fires.)
-#
-# Required tools on the runner
-# ────────────────────────────
-#  git-cliff is installed via cargo during the workflow.
-
 name: Release
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Version to release (SemVer, e.g. 1.2.3 or 1.2.3-beta.1)"
+        description: "Release version (z.B. 1.2.0)"
         required: true
-        type: string
 
 jobs:
   release:
-    name: Prepare release & push tag
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: write # needed for git push via GITHUB_TOKEN fallback
-
     steps:
-      # ── Checkout (full history for git-cliff) ─────────────────────────────
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # git-cliff needs full history
+          fetch-depth: 0
           token: ${{ secrets.RELEASE_PAT }}
 
-      # ── Validate that RELEASE_PAT is set ─────────────────────────────────
-      # GitHub does NOT create workflow-triggering push events when the
-      # default GITHUB_TOKEN is used.  Without a PAT the tag push will
-      # silently succeed but publish.yaml will never be triggered.
-      - name: Validate RELEASE_PAT is configured
-        env:
-          RELEASE_PAT: ${{ secrets.RELEASE_PAT }}
-        run: |
-          if [ -z "${RELEASE_PAT}" ]; then
-            echo "❌  RELEASE_PAT secret is not set."
-            echo ""
-            echo "    A Personal Access Token is required because GitHub does"
-            echo "    not trigger other workflow runs for pushes made with the"
-            echo "    default GITHUB_TOKEN (security measure against recursive"
-            echo "    workflow loops)."
-            echo ""
-            echo "    Without a PAT the tag push will succeed but publish.yaml"
-            echo "    will never fire."
-            echo ""
-            echo "    Fix: create a PAT with 'contents:write' scope and store"
-            echo "    it as the RELEASE_PAT repository secret."
-            exit 1
-          fi
-          echo "✅  RELEASE_PAT is configured – tag push will trigger publish.yaml."
-
-      # ── Configure git identity ────────────────────────────────────────────
-      - name: Configure git identity
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      # ── Validate SemVer ───────────────────────────────────────────────────
-      - name: Validate version format
-        id: validate
-        run: |
-          VERSION="${{ github.event.inputs.version }}"
-          # Strip leading 'v' if someone passes it in
-          VERSION="${VERSION#v}"
-          if ! echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9._-]+)?(\+[a-zA-Z0-9._-]+)?$'; then
-            echo "❌ '$VERSION' is not a valid SemVer string."
-            exit 1
-          fi
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "tag=v$VERSION"    >> "$GITHUB_OUTPUT"
-
-      # ── Set up Dart (needed for dry-run check later) ──────────────────────
-      - name: Set up Dart SDK
+      - name: Setup Dart
         uses: dart-lang/setup-dart@v1
-        with:
-          sdk: stable
 
-      # ── Install dependencies ──────────────────────────────────────────────
       - name: Install dependencies
         run: dart pub get
 
-      # ── Sync pubspec.yaml version ─────────────────────────────────────────
-      - name: Sync version in pubspec.yaml
-        id: pubspec
-        run: |
-          REQUESTED="${{ steps.validate.outputs.version }}"
-          CURRENT=$(grep -m1 '^version:' pubspec.yaml | sed 's/version:[[:space:]]*//')
-          echo "Current pubspec version : $CURRENT"
-          echo "Requested version       : $REQUESTED"
-          if [ "$CURRENT" != "$REQUESTED" ]; then
-            sed -i "s/^version:[[:space:]]*.*/version: $REQUESTED/" pubspec.yaml
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-            echo "✅ pubspec.yaml updated to $REQUESTED"
-          else
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "ℹ️  pubspec.yaml already at $REQUESTED – no change needed."
-          fi
+      - name: Run tests
+        run: dart test --coverage=coverage
 
-      # ── Install git-cliff ─────────────────────────────────────────────────
-      - name: Install git-cliff
-        uses: taiki-e/install-action@v2
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
         with:
-          tool: git-cliff
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage/lcov.info
 
-      # ── Generate CHANGELOG with git-cliff ────────────────────────────────
-      # git-cliff reads cliff.toml (or .cliff.toml) from the repo root.
-      # If you don't have one yet, git-cliff falls back to sensible defaults.
-      - name: Generate CHANGELOG.md
+      # -----------------------------
+      # Version prüfen & setzen
+      # -----------------------------
+      - name: Sync version with pubspec.yaml
         run: |
-          VERSION="${{ steps.validate.outputs.version }}"
-          git-cliff --tag "v$VERSION" --output CHANGELOG.md
-          echo "✅ CHANGELOG.md generated for v$VERSION"
+          INPUT_VERSION=${{ github.event.inputs.version }}
 
-      # ── Commit & push changes (version bump + changelog) ─────────────────
-      # This commit MUST be pushed before the tag so that:
-      #   a) dart pub publish --dry-run sees no "uncommitted changes"
-      #   b) the version listed in CHANGELOG.md matches pubspec.yaml
-      - name: Commit version bump and changelog
-        run: |
-          VERSION="${{ steps.validate.outputs.version }}"
-          # Stage only the two files we care about
-          git add pubspec.yaml CHANGELOG.md
-          # Only commit if there is something staged
-          if git diff --cached --quiet; then
-            echo "ℹ️  Nothing to commit."
+          CURRENT_VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+
+          echo "Current: $CURRENT_VERSION"
+          echo "Input:   $INPUT_VERSION"
+
+          if [ "$CURRENT_VERSION" != "$INPUT_VERSION" ]; then
+            sed -i "s/^version: .*/version: $INPUT_VERSION/" pubspec.yaml
+            echo "Version updated in pubspec.yaml"
           else
-            git commit -m "chore: release v$VERSION [skip ci]"
-            git push origin HEAD
-            echo "✅ Committed and pushed release files."
+            echo "Version already correct"
           fi
 
-      # ── dart pub publish --dry-run ────────────────────────────────────────
-      # Run this AFTER committing so there are no "uncommitted changes" and
-      # the version is present in CHANGELOG.md.
-      - name: Dry-run pub publish
-        run: dart pub publish --dry-run
-
-      # ── Create and push the SemVer tag ────────────────────────────────────
-      # Pushing this tag triggers the separate `publish.yml` workflow which
-      # performs the actual pub.dev publish via OIDC.
-      - name: Create and push tag
+      # -----------------------------
+      # CHANGELOG generieren
+      # -----------------------------
+      - name: Install git-cliff
         run: |
-          TAG="${{ steps.validate.outputs.tag }}"
-          git tag "$TAG"
-          git push origin "$TAG"
-          echo "✅ Tag $TAG pushed – publish workflow will now trigger."
+          curl -sSL https://github.com/orhun/git-cliff/releases/latest/download/git-cliff-x86_64-unknown-linux-gnu.tar.gz \
+          | tar -xz
+          sudo mv git-cliff /usr/local/bin/
 
-      # ── Extract changelog section for this release ────────────────────────
-      - name: Extract release notes from CHANGELOG.md
-        id: notes
+      - name: Generate CHANGELOG
         run: |
-          VERSION="${{ steps.validate.outputs.version }}"
-          # Extract the block between the first '## [version]' header and the next '## ['
-          NOTES=$(awk "/^## \[?v?$VERSION\]?/{flag=1; next} /^## \[/{flag=0} flag" CHANGELOG.md)
-          # Store multi-line string in GITHUB_OUTPUT
-          {
-            echo "body<<EOF"
-            echo "$NOTES"
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
+          git-cliff --output CHANGELOG.md
 
-      # ── Create GitHub Release ─────────────────────────────────────────────
+      # -----------------------------
+      # Commit falls Änderungen
+      # -----------------------------
+      - name: Commit changes if needed
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+          git add pubspec.yaml CHANGELOG.md
+
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(release): ${{ github.event.inputs.version }}"
+            git push
+          else
+            echo "No changes to commit"
+          fi
+
+      # -----------------------------
+      # Tag erstellen
+      # -----------------------------
+      - name: Create tag
+        run: |
+          VERSION=${{ github.event.inputs.version }}
+          git tag "v$VERSION"
+          git push origin "v$VERSION"
+
+      # -----------------------------
+      # GitHub Release erstellen
+      # -----------------------------
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.validate.outputs.tag }}
-          name: "Release ${{ steps.validate.outputs.tag }}"
-          body: ${{ steps.notes.outputs.body }}
-          draft: false
-          prerelease: ${{ contains(steps.validate.outputs.version, '-') }}
+          tag_name: v${{ github.event.inputs.version }}
+          body_path: CHANGELOG.md
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_PAT }}
+
+      # -----------------------------
+      # pub.dev publish vorbereiten
+      # -----------------------------
+      - name: Setup pub credentials
+        run: |
+          mkdir -p ~/.pub-cache
+          echo '${{ secrets.PUB_CREDENTIALS }}' > ~/.pub-cache/credentials.json
+
+      # -----------------------------
+      # VALIDATION (wichtig!)
+      # -----------------------------
+      - name: Dart publish dry-run
+        run: dart pub publish --dry-run
+
+      # -----------------------------
+      # Publish zu pub.dev
+      # -----------------------------
+      - name: Publish package
+        run: dart pub publish -f
