@@ -1,69 +1,59 @@
+# .github/workflows/ci.yml
+#
+# CI Workflow – Build · Test · Analyze
+#
+# Runs on every push and pull-request.
+# Test results are uploaded to Codecov.
+
 name: CI
 
 on:
   push:
-    branches:
-      - "**"
+    branches: ["**"]
   pull_request:
-    branches:
-      - main
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+    branches: ["**"]
 
 jobs:
-  build-test-analyze:
-    name: Build, Test & Analyze
+  ci:
+    name: Build · Test · Analyze
     runs-on: ubuntu-latest
 
     steps:
+      # ── Checkout ──────────────────────────────────────────────────────────
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Dart SDK
+      # ── Dart SDK ──────────────────────────────────────────────────────────
+      - name: Set up Dart SDK
         uses: dart-lang/setup-dart@v1
         with:
           sdk: stable
 
-      - name: Cache pub dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.pub-cache
-            .dart_tool
-          key: pub-${{ runner.os }}-${{ hashFiles('pubspec.yaml', 'pubspec.lock') }}
-          restore-keys: |
-            pub-${{ runner.os }}-
-
+      # ── Dependencies ──────────────────────────────────────────────────────
       - name: Install dependencies
         run: dart pub get
 
-      - name: Verify formatting
-        run: dart format --output=none --set-exit-if-changed .
-
-      - name: Analyze
+      # ── Static analysis ───────────────────────────────────────────────────
+      - name: Analyze code (dart analyze)
         run: dart analyze --fatal-infos
 
-      - name: Install coverage tools
-        run: dart pub global activate coverage
+      # ── Formatting ────────────────────────────────────────────────────────
+      - name: Check formatting (dart format)
+        run: dart format --output=none --set-exit-if-changed .
 
-      # dart test --coverage only instruments code loaded via package: URIs (lib/).
-      # For CLI tools with a bin/ entrypoint the collector finds no .json files.
-      # Instead we drive the VM directly with --coverage so every loaded library
-      # (including bin/ and lib/) is instrumented.
+      # ── Tests with coverage ───────────────────────────────────────────────
       - name: Run tests with coverage
-        run: |
-          dart pub global run coverage:test_with_coverage \
-            --function-coverage \
-            --branch-coverage \
-            -- --reporter=expanded
+        run: dart test --coverage=coverage
 
+      # ── Convert to lcov ───────────────────────────────────────────────────
+      - name: Convert coverage to lcov
+        run: dart pub run coverage:format_coverage --lcov --in=coverage --out=coverage/lcov.info --report-on=lib
+
+      # ── Upload to Codecov ─────────────────────────────────────────────────
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
           files: coverage/lcov.info
-          flags: unittests
           fail_ci_if_error: true
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
