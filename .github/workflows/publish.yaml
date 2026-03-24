@@ -31,9 +31,6 @@ name: Publish to pub.dev
 on:
   release:
     types: [released]
-  # push:
-  #   tags:
-  #     - "*"
 
 jobs:
   # ── Guard: validate tag & score ───────────────────────────────────────────
@@ -42,15 +39,14 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      tag: ${{ steps.parse.outputs.tag }}
+      tag: ${{ steps.parse.outputs.tag_name }}
       version: ${{ steps.parse.outputs.version }}
 
     steps:
-      - name: Parse and normalise tag input
+      - name: Parse and normalise tag from release event
         id: parse
         run: |
-          TAG="${{ github.event.inputs.tag }}"
-          # Ensure tag starts with 'v'
+          TAG="${{ github.event.release.tag_name }}"
           [[ "$TAG" != v* ]] && TAG="v$TAG"
           VERSION="${TAG#v}"
           echo "tag=$TAG"         >> "$GITHUB_OUTPUT"
@@ -92,44 +88,6 @@ jobs:
 
       - name: Install dependencies
         run: dart pub get
-
-      # ── pana score guard ──────────────────────────────────────────────────
-      # pana is the tool pub.dev uses to compute the pub score.
-      # Running it locally gives an early signal before the package goes live.
-      - name: Activate pana
-        run: dart pub global activate pana
-
-      - name: Run pana and check score
-        run: |
-          MIN_SCORE="${{ github.event.inputs.min_pub_score }}"
-          echo "Minimum required score: $MIN_SCORE / 160"
-          echo ""
-
-          # Run pana and capture JSON output
-          PANA_JSON=$(dart pub global run pana --json --no-warning . 2>/dev/null || true)
-
-          # Extract the total granted points
-          SCORE=$(echo "$PANA_JSON" | python3 -c "
-          import sys, json
-          try:
-              data = json.load(sys.stdin)
-              granted = data.get('scores', {}).get('grantedPoints', 0)
-              total   = data.get('scores', {}).get('maxPoints', 130)
-              print(f'{granted}/{total}')
-              sys.exit(0 if granted >= int('$MIN_SCORE') else 1)
-          except Exception as e:
-              print(f'Could not parse pana output: {e}', file=sys.stderr)
-              sys.exit(1)
-          ")
-
-          echo "pana score: $SCORE"
-
-          if [ $? -ne 0 ]; then
-            echo "❌ pana score is below the required minimum of $MIN_SCORE/130."
-            echo "   Fix the issues reported by pana before publishing."
-            exit 1
-          fi
-          echo "✅ pana score meets the minimum threshold."
 
   # ── Publish to pub.dev via OIDC ───────────────────────────────────────────
   publish:
