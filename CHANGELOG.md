@@ -5,6 +5,7 @@
 - Replace single-job publish workflow with two-job approach for pub.dev OIDC compliance ([4f3adf1](4f3adf1e63b486a061aaf751684dfe9ecd8a9547))
 - Replace single-job publish workflow with two-job approach for pub.dev OIDC compliance ([c3e49d1](c3e49d125a793470ae0cc56117702a4cbc00d444))
 - Correct tag glob pattern in publish.yaml so it triggers on version tags ([84e5157](84e5157347afa1bffadf54fac98f26d1b845a324))
+- Validate RELEASE_PAT is set to prevent silent publish.yaml non-trigger ([0862479](0862479ae335e1332f5a8eb62ffcfe0836aa4083))
 
 ### ⚙️  CI/CD
 
