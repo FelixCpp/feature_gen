@@ -21,10 +21,11 @@
 #
 # Required secrets / variables
 # ────────────────────────────
-#  GH_PAT  – a Personal Access Token (or fine-grained token) with
-#             contents:write and workflows:write scopes.
-#             (The default GITHUB_TOKEN cannot push commits that trigger
-#              other workflows, which is why a PAT is needed.)
+#  RELEASE_PAT  – a Personal Access Token (or fine-grained token) with
+#                 contents:write scope.
+#                 (The default GITHUB_TOKEN cannot push commits/tags that
+#                  trigger other workflows.  If this secret is absent the tag
+#                  push silently uses GITHUB_TOKEN, publish.yaml never fires.)
 #
 # Required tools on the runner
 # ────────────────────────────
@@ -55,6 +56,31 @@ jobs:
         with:
           fetch-depth: 0 # git-cliff needs full history
           token: ${{ secrets.RELEASE_PAT }}
+
+      # ── Validate that RELEASE_PAT is set ─────────────────────────────────
+      # GitHub does NOT create workflow-triggering push events when the
+      # default GITHUB_TOKEN is used.  Without a PAT the tag push will
+      # silently succeed but publish.yaml will never be triggered.
+      - name: Validate RELEASE_PAT is configured
+        env:
+          RELEASE_PAT: ${{ secrets.RELEASE_PAT }}
+        run: |
+          if [ -z "${RELEASE_PAT}" ]; then
+            echo "❌  RELEASE_PAT secret is not set."
+            echo ""
+            echo "    A Personal Access Token is required because GitHub does"
+            echo "    not trigger other workflow runs for pushes made with the"
+            echo "    default GITHUB_TOKEN (security measure against recursive"
+            echo "    workflow loops)."
+            echo ""
+            echo "    Without a PAT the tag push will succeed but publish.yaml"
+            echo "    will never fire."
+            echo ""
+            echo "    Fix: create a PAT with 'contents:write' scope and store"
+            echo "    it as the RELEASE_PAT repository secret."
+            exit 1
+          fi
+          echo "✅  RELEASE_PAT is configured – tag push will trigger publish.yaml."
 
       # ── Configure git identity ────────────────────────────────────────────
       - name: Configure git identity
