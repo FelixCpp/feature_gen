@@ -3,94 +3,6 @@
 All notable changes to this project will be documented in this file.
 Versions follow [Semantic Versioning](https://semver.org).
 
-## [1.2.0] - 2026-03-24
-
-### Bug Fixes
-
-- Fix: replace single-job publish workflow with two-job approach for pub.dev OIDC compliance ([`4f3adf1`](4f3adf1e63b486a061aaf751684dfe9ecd8a9547))
-- Fix: replace single-job publish workflow with two-job approach for pub.dev OIDC compliance ([`c3e49d1`](c3e49d125a793470ae0cc56117702a4cbc00d444))
-- Fix readme, added riverpod documentation ([`77e079f`](77e079f103c1a0641e0b6f9d968a1763cfdd179c))
-- Fix code structure in main.dart ([`40814a5`](40814a5750d90f5fb9796cdd67614bd8923c22f2))
-- Fix readme badge ([`5d35122`](5d351226d1e26b08c7afc353ca46133e86d24010))
-- Fix badge link ([`3472fab`](3472fabd323435a3e1b66bb9dc9984c416bd77c9))
-- Fix test paths for windows platform ([`f8db3a9`](f8db3a9e76ea46de8e0c0d3ecdf595c998999fca))
-- Fixed MemoryFileSystem FileSystemStyle to work on Windows platform ([`c150ae9`](c150ae9ba84dbf086760c210c34edd8cd39d8bd3))
-- Fix triggering workflow by tagging ([`dfd8294`](dfd82945aeb6fbba245e1aead865c40ce62865d2))
-- Fix: correct tag glob pattern in publish.yaml so it triggers on version tags ([`84e5157`](84e5157347afa1bffadf54fac98f26d1b845a324))
-- Fix: validate RELEASE_PAT is set to prevent silent publish.yaml non-trigger ([`0862479`](0862479ae335e1332f5a8eb62ffcfe0836aa4083))
-
-### Miscellaneous
-
-- Chore: release v1.2.0 [skip ci] ([`7fd6f17`](7fd6f173a0463fc7c89f1a849792797707257d66))
-- Chore: release v1.2.0 [skip ci] ([`84f5bcd`](84f5bcdb00dd8821801b786820c229e6c4b1e92c))
-- Chore: release v1.2.0 [skip ci] ([`ccd6088`](ccd6088bc5fd1360a138ddc1cdf8cb74e8171f1c))
-- Chore: release v1.2.0 [skip ci] ([`5fc79a4`](5fc79a492d4bda447416c695a46854e5045d9d90))
-- Chore: release v1.2.0 [skip ci] ([`cbd1d9a`](cbd1d9aa58a3dd67c9653d20d027acc617a977dc))
-- Chore: release v1.2.0 [skip ci] ([`6c1fa8f`](6c1fa8f2ef37e032ee13aa49ef4c347b33db9041))
-
-### Other
-
-- Initial plan ([`15e2742`](15e274247f97f14293b30e521f695c885beb00cf))
-- Merge pull request #12 from FelixCpp/copilot/setup-ci-cd-process ([`d0e3120`](d0e312060180bf1b109a79740c3b1373489edd28))
-- Initial plan ([`ce5e7d0`](ce5e7d02ad5e7d15af7457d15bbe2d19d89b4e5f))
-- Merge pull request #12 from FelixCpp/copilot/setup-ci-cd-process ([`2f8939a`](2f8939a5d94293ba70b2360132cc5058126afd6f))
-- Merge branch 'develop' of github.com:FelixCpp/dart_feature_gen into develop ([`9179fa2`](9179fa20728103d37e8d167bf1698fe57bc1ba36))
-- Added riverpod state-management library ([`fa10da7`](fa10da71a398176dfb2689c6428bd9118d17e7a1))
-- Merge pull request #14 from FelixCpp/feat/riverpod ([`99c4acd`](99c4acd4ddc3d435449c97a3035bb51b60afa104))
-- Merge pull request #13 from FelixCpp/develop ([`cbe9c9e`](cbe9c9ea126497797c71e2bd6607dbbab9fb03e1))
-- Revert "refactor yaml config loader" ([`f875e38`](f875e382bcc239927146502b7cb76da771ba0c60))
-- New workflow added ([`dbee983`](dbee983e4aaea45596b8200184eebac657affb68))
-- Merge pull request #15 from FelixCpp/fix/pipeline ([`0d790ed`](0d790ed996c87ab68eca42996c9fa7ef85ec8be2))
-- Traverse directories searching for root config file ([`5b676a6`](5b676a6dbc6171bcd021e540587c398b3de4fd94))
-- Merge branch 'fix/find_config_file' of github.com:FelixCpp/dart_feature_gen into fix/find_config_file ([`066827e`](066827ea94ada1074d410cded35c4753b8bd1aac))
-- Readme update ([`095f2b0`](095f2b09f186b5e07be2fbc2324d21a9985b79ec))
-- Add codecov ignoring list ([`2cdbe65`](2cdbe659d5a2c9d5292daaf5c62203e6ffb9e6f2))
-- Merge pull request #16 from FelixCpp/fix/find_config_file ([`cc10889`](cc1088956bed65d51cba9f01df621098a9bd8ab8))
-- Merge pull request #17 from FelixCpp/fix/find_config_file ([`fc50ea0`](fc50ea05d40a236d1e50dc31d9c6da1e972d06ce))
-- Another fix for windows ([`fa75981`](fa7598137f00e0f6450870e577dbc275b0383678))
-- Windows stuff i guess ([`d6941bc`](d6941bc51c2404f78f642d11e60b24f04b46c028))
-- Merge pull request #18 from FelixCpp/develop ([`1c86b7e`](1c86b7e5b915d7f98b5b87b053f1a179a9ae4f45))
-- Merge pull request #19 from FelixCpp/main ([`bff4b44`](bff4b44f77100db494827d8b1b91bfbb732887e0))
-- Merge pull request #20 from FelixCpp/develop ([`ab28b91`](ab28b91b88630c478a7fe3962a82d6a945ff29de))
-- Version update ([`4e0cf58`](4e0cf584721860e7d79d1b6f4b1e97ba4f6e8458))
-- Prepend changelog ([`b1f7760`](b1f7760891bd73d9e4f2a9d2c9f918beb154dfa5))
-- Typo fix ([`3c2aa84`](3c2aa8414f0d155b068533c2485bb28253c1ede9))
-- No output for now ([`5699fea`](5699feae333629d62d24bb2434b9abaa408b193e))
-- Changelog cleanup ([`d7857c4`](d7857c40fe9c72c5711b20cf2671b1f4ba61124d))
-- Publish workflow ([`3b9b76c`](3b9b76c2c88593503942a30c646d92dfca316e8a))
-- CI ([`f98ffe0`](f98ffe09d53378d74bffe20cada253e6756df383))
-- Changelog ([`c934780`](c934780a61a0f21f124df9cd6e0b7bcab13703c1))
-- Release job you know ([`a4ef804`](a4ef80431dd0f4cf2040e8fc1c75626d5be997bd))
-- Reset changelog ([`868c087`](868c08763239417fb1a9bd86612cd479a006f097))
-- Release pat ([`20a16e6`](20a16e65bbc759f923d4eeff136c3eb4d22a8ad5))
-- Reset changelog ([`a7bf639`](a7bf639710e4d7b862b1517d114a023b082ca000))
-- Manual publishing? ([`58f46c4`](58f46c4d5b2be0ab62cafcd8e8e49bb8806268f9))
-- Prepare release 1.2 ([`a727643`](a727643848cf2709175a3f4246ccd1ff7b10faff))
-- Release job fix ([`0584c46`](0584c46e5f4a8a5b16dcc7e533cd22ec718d75fb))
-- Separate release+publish jobs ([`bb482c6`](bb482c642facdbd96ca55e0371e8170dd8820485))
-- Changelog reset ([`e236d45`](e236d45fe9995325c7b64e7c40d6645843bc0095))
-- Using different image ([`cebb954`](cebb954149555d861327a61715b4b2c76a49799a))
-- Revert changelog ([`114868b`](114868b2303e489aa39792dd261e0db1d7d0002f))
-- Coverage dependency ([`8e3fda4`](8e3fda4b8a789d6ebc363ed6f0e92433a91b988c))
-- Renamed token ([`d7b265f`](d7b265fc3c6c6140414ec38fa4eda46846c28d6a))
-- Reset changelog ([`96fc091`](96fc09136c59b864eef1b4d11d90c4df190a3063))
-- Initial plan ([`2db69cd`](2db69cd9288b3aa1276cbfa7700ae9855091ce9a))
-- Merge pull request #21 from FelixCpp/copilot/fix-publishing-workflow-trigger ([`61894ab`](61894ab86313e6bc68a2555130393089ddbb11fe))
-- Initial plan ([`f5ca3be`](f5ca3be636f3bddf6fed8bb7334ff88f353b26d7))
-- Merge pull request #22 from FelixCpp/copilot/fix-publish-workflow-issue ([`85a8504`](85a8504e3db15bdf924b5e4bc9df42aa408a7b86))
-- Releasing stuff ([`4d7b9ca`](4d7b9ca2bfdc4e8c9fd79365fb1c2e442ff94919))
-- Removed invalid environment ([`c0e9a7e`](c0e9a7edbd48abfe8add0e30371a7a5c3b9a43b9))
-- Triggered by releases or tags ([`57387b8`](57387b889d98493a0f64a30618ee411a89cd557f))
-- Reset changelog ([`c4e6ba6`](c4e6ba6cbf1b9f7518f1b243d8306b9d12485970))
-- Removed fallback ([`8ffa5a3`](8ffa5a34934ea9992c05858629c8fce870f790ce))
-- Removed min score ([`36045d4`](36045d4fe9a98e3b2f0b4b75171d780b83bc65a2))
-- Reset change ([`627683b`](627683b48835032e27d6788c70b2765ed6cea5f0))
-
-### Refactoring
-
-- Refactor yaml config loader ([`0beb037`](0beb03720423c0fe91db01c9aecb957be0c7e330))
-- Refactor yaml config loader ([`5bfa808`](5bfa808f81a6618bcf4297228f440dc4e3947559))
-
 ## [1.1.0] - 2026-03-18
 
 ### Bug Fixes
@@ -182,4 +94,5 @@ Versions follow [Semantic Versioning](https://semver.org).
 - Merge pull request #6 from FelixCpp/develop ([`d9473f6`](d9473f6b6457d13b886f9d4f2fd1dffcbb951cb8))
 
 ---
-*Generated by [git-cliff](https://git-cliff.org)*
+
+_Generated by [git-cliff](https://git-cliff.org)_

@@ -1,0 +1,147 @@
+name: Prepare Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (e.g. 1.2.3 – without 'v' prefix)"
+        required: true
+        type: string
+
+jobs:
+  preflight:
+    name: Preflight Checks
+    runs-on: ubuntu-latest
+    # Nur von main aus erlaubt
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # PAT wird benötigt, damit der gepushte Tag den release.yml-Workflow auslöst.
+          # Ein normaler GITHUB_TOKEN kann keine weiteren Workflows triggern.
+          token: ${{ secrets.PAT_TOKEN }}
+          # Vollständige History für git-cliff und git-Checks
+          fetch-depth: 0
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install dependencies
+        run: dart pub get
+
+      # ------------------------------------------------------------------
+      # 1. Branch-Check
+      # ------------------------------------------------------------------
+      - name: Check branch is main
+        run: |
+          BRANCH="${{ github.ref_name }}"
+          if [ "$BRANCH" != "main" ]; then
+            echo "::error::Releases dürfen nur von 'main' aus erstellt werden (aktuell: $BRANCH)"
+            exit 1
+          fi
+          echo "✓ Branch: $BRANCH"
+
+      # ------------------------------------------------------------------
+      # 2. Uncommitted changes
+      # ------------------------------------------------------------------
+      - name: Check for uncommitted changes
+        run: |
+          if ! git diff --quiet || ! git diff --staged --quiet; then
+            echo "::error::Das Working Tree ist nicht sauber. Bitte erst alle Änderungen committen."
+            git status --short
+            exit 1
+          fi
+          echo "✓ Working Tree ist sauber"
+
+      # ------------------------------------------------------------------
+      # 3. Tag existiert noch nicht
+      # ------------------------------------------------------------------
+      - name: Check tag does not exist yet
+        run: |
+          TAG="v${{ inputs.version }}"
+          if git ls-remote --tags origin "$TAG" | grep -q "$TAG"; then
+            echo "::error::Tag $TAG existiert bereits auf origin."
+            exit 1
+          fi
+          echo "✓ Tag $TAG ist noch nicht vergeben"
+
+      # ------------------------------------------------------------------
+      # 4. Version in pubspec.yaml stimmt mit Input überein
+      # ------------------------------------------------------------------
+      - name: Check version in pubspec.yaml
+        run: |
+          PUBSPEC_VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | tr -d '[:space:]')
+          INPUT_VERSION="${{ inputs.version }}"
+
+          echo "pubspec.yaml : $PUBSPEC_VERSION"
+          echo "Input        : $INPUT_VERSION"
+
+          if [ "$PUBSPEC_VERSION" != "$INPUT_VERSION" ]; then
+            echo "::error::Versionskonflikt! pubspec.yaml enthält '$PUBSPEC_VERSION', aber du willst '$INPUT_VERSION' releasen."
+            echo "::error::Bitte pubspec.yaml anpassen und committen, bevor du den Release-Workflow startest."
+            exit 1
+          fi
+          echo "✓ Versionen stimmen überein: $PUBSPEC_VERSION"
+
+      # ------------------------------------------------------------------
+      # 5. dart pub publish --dry-run
+      #    Prüft u. a.: Paketstruktur, Dateigrößen, Lizenz, pubspec-Felder
+      # ------------------------------------------------------------------
+      - name: Dry-run publish
+        run: |
+          dart pub publish --dry-run
+          echo "✓ Dry-run erfolgreich"
+
+      # ------------------------------------------------------------------
+      # 6. CHANGELOG generieren und committen
+      #    Passiert vor dem Tag, damit der Tag den finalen Stand einschließt
+      #    und der CHANGELOG im GitHub Release sauber angezeigt wird.
+      # ------------------------------------------------------------------
+      - name: Install git-cliff
+        uses: kenji-miyake/setup-git-cliff@v2
+
+      - name: Generate CHANGELOG.md
+        run: git cliff --output CHANGELOG.md
+
+      - name: Commit CHANGELOG.md
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          git diff --staged --quiet || git commit -m "chore: update CHANGELOG.md for v${{ inputs.version }}"
+          git push origin main
+
+      # ------------------------------------------------------------------
+      # 7. Tag erstellen und pushen
+      #    git pull stellt sicher, dass der Tag auf dem CHANGELOG-Commit sitzt
+      #    und nicht auf dem Stand vor dem push.
+      #    Die Remote-URL wird explizit mit dem PAT gesetzt, da nur so GitHub
+      #    den Tag-Push als externen Event wertet und release.yml auslöst.
+      # ------------------------------------------------------------------
+      - name: Create and push tag
+        run: |
+          TAG="v${{ inputs.version }}"
+          # git pull origin main
+          git remote set-url origin "https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git"
+          git tag "$TAG" -m "Release $TAG"
+          git push origin "$TAG"
+          echo "✓ Tag $TAG wurde gepusht – release.yml startet jetzt automatisch"
+
+      # ------------------------------------------------------------------
+      # Job Summary
+      # ------------------------------------------------------------------
+      - name: Write job summary
+        if: success()
+        run: |
+          TAG="v${{ inputs.version }}"
+          cat >> $GITHUB_STEP_SUMMARY << EOF
+          ## Release $TAG vorbereitet ✓
+
+          Alle Preflight-Checks bestanden. CHANGELOG.md wurde aktualisiert, Tag \`$TAG\` wurde gepusht.
+
+          **Nächste Schritte (automatisch):**
+          1. \`release.yml\` läuft jetzt: pub.dev publish → GitHub Release
+
+          [Zum laufenden Release-Workflow](https://github.com/${{ github.repository }}/actions)
+          EOF

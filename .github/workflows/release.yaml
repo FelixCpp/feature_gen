@@ -1,220 +1,43 @@
-# .github/workflows/release.yml
-#
-# Release & Publish Workflow
-#
-# Triggered manually via workflow_dispatch.
-# Job 1 "release": Validates SemVer, syncs pubspec.yaml, generates the
-#   CHANGELOG with git-cliff, commits & pushes, runs dart pub publish
-#   --dry-run as a gate, then creates & pushes the Git tag.
-# Job 2 "publish": Checks out the tagged commit and publishes to pub.dev
-#   via OIDC (workflow_dispatch satisfies pub.dev's event requirement),
-#   then creates the GitHub Release.
-#
-# Required secrets
-# ────────────────
-#   RELEASE_PAT – Fine-grained PAT with Contents: Read & Write.
-
 name: Release
 
+# pub.dev erlaubt automatisches Publizieren NUR bei Tag-Pushes.
+# Ohne diesen Trigger lehnt pub.dev den Publish-Versuch ab.
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: "Version to release (SemVer, e.g. 1.2.3 or 1.2.3-beta.1)"
-        required: true
-        type: string
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+*"
 
 jobs:
-  # ══════════════════════════════════════════════════════════════════════════
-  # JOB 1 – Prepare the release: validate, bump, changelog, commit, tag
-  # ══════════════════════════════════════════════════════════════════════════
-  release:
-    name: Prepare release
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: write
-
-    outputs:
-      version: ${{ steps.validate.outputs.version }}
-      tag: ${{ steps.validate.outputs.tag }}
-
-    steps:
-      # ── Checkout ────────────────────────────────────────────────────────
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.RELEASE_PAT }}
-
-      # ── Git identity ─────────────────────────────────────────────────────
-      - name: Configure git identity
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      # ── Validate SemVer ──────────────────────────────────────────────────
-      - name: Validate version format
-        id: validate
-        run: |
-          VERSION="${{ github.event.inputs.version }}"
-          VERSION="${VERSION#v}"
-          if ! echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9._-]+)?(\+[a-zA-Z0-9._-]+)?$'; then
-            echo "❌ '$VERSION' is not a valid SemVer string."
-            exit 1
-          fi
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "tag=v$VERSION"    >> "$GITHUB_OUTPUT"
-          echo "✅ Version $VERSION is valid SemVer."
-
-      # ── Check tag does not already exist ─────────────────────────────────
-      - name: Check tag availability
-        run: |
-          TAG="${{ steps.validate.outputs.tag }}"
-          if git rev-parse --verify "refs/tags/$TAG" &>/dev/null; then
-            echo "❌ Tag $TAG already exists. Bump the version."
-            exit 1
-          fi
-          echo "✅ Tag $TAG is available."
-
-      # ── Dart SDK & dependencies ──────────────────────────────────────────
-      - name: Set up Dart SDK
-        uses: dart-lang/setup-dart@v1
-        with:
-          sdk: stable
-
-      - name: Install dependencies
-        run: dart pub get
-
-      # ── Sync pubspec.yaml ────────────────────────────────────────────────
-      - name: Sync version in pubspec.yaml
-        run: |
-          REQUESTED="${{ steps.validate.outputs.version }}"
-          CURRENT=$(grep -m1 '^version:' pubspec.yaml | sed 's/version:[[:space:]]*//')
-          echo "Current : $CURRENT"
-          echo "Requested: $REQUESTED"
-          if [ "$CURRENT" != "$REQUESTED" ]; then
-            sed -i "s/^version:[[:space:]]*.*/version: $REQUESTED/" pubspec.yaml
-            echo "✅ pubspec.yaml updated → $REQUESTED"
-          else
-            echo "ℹ️  pubspec.yaml already at $REQUESTED."
-          fi
-
-      # ── Compile-check ────────────────────────────────────────────────────
-      - name: Compile executable (smoke test)
-        run: dart compile exe bin/dart_feature_gen.dart -o /tmp/dart_feature_gen
-
-      # ── Install git-cliff ────────────────────────────────────────────────
-      - name: Install git-cliff
-        uses: taiki-e/install-action@v2
-        with:
-          tool: git-cliff
-
-      # ── Generate CHANGELOG ───────────────────────────────────────────────
-      - name: Generate CHANGELOG.md
-        run: |
-          VERSION="${{ steps.validate.outputs.version }}"
-          git-cliff --tag "v$VERSION" --output CHANGELOG.md
-          echo "✅ CHANGELOG.md generated for v$VERSION"
-
-      # ── Commit & push ────────────────────────────────────────────────────
-      # Must happen BEFORE dry-run: dart pub publish --dry-run fails when
-      # tracked files (pubspec.yaml, CHANGELOG.md) are modified.
-      - name: Commit version bump and changelog
-        run: |
-          VERSION="${{ steps.validate.outputs.version }}"
-          git add pubspec.yaml CHANGELOG.md
-          if git diff --cached --quiet; then
-            echo "ℹ️  Nothing to commit."
-          else
-            git commit -m "chore: release v$VERSION [skip ci]"
-            git push origin HEAD
-            echo "✅ Pushed release commit."
-          fi
-
-      # ── Dry-run gate ─────────────────────────────────────────────────────
-      # Tag is only created when this passes – no broken releases slip through.
-      - name: dart pub publish --dry-run
-        run: dart pub publish --dry-run
-
-      # ── Create & push tag ────────────────────────────────────────────────
-      - name: Create and push tag
-        run: |
-          TAG="${{ steps.validate.outputs.tag }}"
-          git tag "$TAG"
-          git push origin "$TAG"
-          echo "✅ Tag $TAG created and pushed."
-
-  # ══════════════════════════════════════════════════════════════════════════
-  # JOB 2 – Publish to pub.dev & create GitHub Release
-  #
-  # Runs after "release" succeeds. Checks out the exact tagged commit so
-  # pub.dev sees the committed CHANGELOG and pubspec.yaml.
-  #
-  # pub.dev OIDC accepts this because the root trigger is workflow_dispatch
-  # (not a 'release' event). The GitHub Release is created HERE – not in
-  # job 1 – so no softprops/action-gh-release fires a 'release' event that
-  # could confuse pub.dev.
-  # ══════════════════════════════════════════════════════════════════════════
   publish:
-    name: Publish to pub.dev & create GitHub Release
+    name: Publish to pub.dev
     runs-on: ubuntu-latest
-    needs: release
-
     permissions:
-      contents: write # Create GitHub Release
-      id-token: write # OIDC token for pub.dev
-
+      # Erforderlich für OIDC-basierte Authentifizierung gegenüber pub.dev
+      id-token: write
+      # Erforderlich für das Erstellen eines GitHub Releases
+      contents: write
     steps:
-      # ── Checkout the exact tagged commit ─────────────────────────────────
-      - name: Checkout ${{ needs.release.outputs.tag }}
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          ref: ${{ needs.release.outputs.tag }}
           fetch-depth: 0
 
-      # ── Dart SDK & dependencies ──────────────────────────────────────────
-      - name: Set up Dart SDK
-        uses: dart-lang/setup-dart@v1
+      - uses: dart-lang/setup-dart@v1
         with:
           sdk: stable
 
-      - name: Install dependencies
-        run: dart pub get
-
-      # ── Publish to pub.dev via OIDC ──────────────────────────────────────
-      # pub.dev allows this because the workflow was triggered by
-      # workflow_dispatch – not a 'release' event.
-      # dart-lang/setup-dart handles the OIDC token exchange automatically.
+      # Die offizielle Action übernimmt das OIDC-Handshake mit pub.dev
+      # vollständig – kein dart pub get, kein --force nötig.
       - name: Publish to pub.dev
-        run: dart pub publish --force
+        uses: dart-lang/pub-dev-action@v1
 
-      # ── Extract release notes ────────────────────────────────────────────
+      # Extrahiert nur den Changelog-Abschnitt der aktuellen Version
       - name: Install git-cliff
-        uses: taiki-e/install-action@v2
-        with:
-          tool: git-cliff
+        uses: kenji-miyake/setup-git-cliff@v2
 
-      - name: Extract release notes
-        id: notes
-        run: |
-          NOTES=$(git-cliff \
-            --config cliff.toml \
-            --latest \
-            --strip header)
-          echo "body<<EOF" >> "$GITHUB_OUTPUT"
-          echo "$NOTES"    >> "$GITHUB_OUTPUT"
-          echo "EOF"       >> "$GITHUB_OUTPUT"
-
-      # ── Create GitHub Release ────────────────────────────────────────────
-      # Created AFTER pub.dev publish so that the 'release' event this
-      # generates cannot interfere with the OIDC authentication above.
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ needs.release.outputs.tag }}
-          name: "Release ${{ needs.release.outputs.tag }}"
-          body: ${{ steps.notes.outputs.body }}
-          draft: false
-          prerelease: ${{ contains(needs.release.outputs.version, '-') }}
-          token: ${{ secrets.RELEASE_PAT }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git cliff --current --strip all | gh release create "${{ github.ref_name }}" \
+            --title "${{ github.ref_name }}" \
+            --notes-file -
