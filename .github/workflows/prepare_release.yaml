@@ -18,8 +18,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           # PAT wird benötigt, damit der gepushte Tag den release.yml-Workflow auslöst.
-          # Ein normaler GITHUB_TOKEN kann keine weiteren Workflows triggern.
-          token: ${{ secrets.PAT_TOKEN }}
+          # Ein normaler RELEASE_PAT kann keine weiteren Workflows triggern.
+          token: ${{ secrets.RELEASE_PAT }}
           # Vollständige History für git-cliff und git-Checks
           fetch-depth: 0
 
@@ -123,7 +123,7 @@ jobs:
         run: |
           TAG="v${{ inputs.version }}"
           # git pull origin main
-          git remote set-url origin "https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git"
+          git remote set-url origin "https://x-access-token:${{ secrets.RELEASE_PAT }}@github.com/${{ github.repository }}.git"
           git tag "$TAG" -m "Release $TAG"
           git push origin "$TAG"
           echo "✓ Tag $TAG wurde gepusht – release.yml startet jetzt automatisch"
