@@ -116,7 +116,7 @@ sealed class ${className}State with _\$${className}State {
 ''';
   }
 
-  static String _stateSealedUnion(String featureName) {
+  static String _stateNative(String featureName) {
     final className = featureName.pascalCase;
 
     return '''
@@ -135,7 +135,7 @@ class _Initial implements ${className}State {
   static String state(String featureName, DataClassFormat format) {
     return switch (format) {
       DataClassFormat.freezed => _stateFreezed(featureName),
-      DataClassFormat.sealedUnion => _stateSealedUnion(featureName),
+      DataClassFormat.native => _stateNative(featureName),
     };
   }
 
@@ -152,7 +152,7 @@ sealed class ${className}Event with _\$${className}Event {
 ''';
   }
 
-  static String _eventSealedUnion(String featureName) {
+  static String _eventNative(String featureName) {
     final className = featureName.pascalCase;
 
     return '''
@@ -171,11 +171,11 @@ class _OnSetup implements ${className}Event {
   static String event(String featureName, DataClassFormat format) {
     return switch (format) {
       DataClassFormat.freezed => _eventFreezed(featureName),
-      DataClassFormat.sealedUnion => _eventSealedUnion(featureName),
+      DataClassFormat.native => _eventNative(featureName),
     };
   }
 
-  static String blocFreezed(String featureName) {
+  static String _blocFreezed(String featureName) {
     final className = featureName.pascalCase;
 
     return '''
@@ -200,7 +200,7 @@ class ${className}Bloc extends Bloc<${className}Event, ${className}State> {
 ''';
   }
 
-  static String blocSealedUnions(String featureName) {
+  static String _blocNative(String featureName) {
     final className = featureName.pascalCase;
 
     return '''
@@ -225,8 +225,8 @@ class ${className}Bloc extends Bloc<${className}Event, ${className}State> {
 
   static String bloc(String featureName, DataClassFormat format) {
     return switch (format) {
-      DataClassFormat.freezed => blocFreezed(featureName),
-      DataClassFormat.sealedUnion => blocSealedUnions(featureName),
+      DataClassFormat.freezed => _blocFreezed(featureName),
+      DataClassFormat.native => _blocNative(featureName),
     };
   }
 
@@ -289,7 +289,7 @@ sealed class ${className}State with _\$${className}State {
 ''';
   }
 
-  static String _stateSealedUnion(String featureName) {
+  static String _stateNative(String featureName) {
     final className = featureName.pascalCase;
 
     return '''
@@ -310,7 +310,7 @@ class _${className}Initial implements ${className}State {
   static String state(String featureName, DataClassFormat format) {
     return switch (format) {
       DataClassFormat.freezed => _stateFreezed(featureName),
-      DataClassFormat.sealedUnion => _stateSealedUnion(featureName),
+      DataClassFormat.native => _stateNative(featureName),
     };
   }
 
@@ -330,7 +330,7 @@ class ${className}Cubit extends Cubit<${className}State> {
 ''';
   }
 
-  static String cubitSealedUnion(String featureName) {
+  static String _cubitNative(String featureName) {
     final className = featureName.pascalCase;
 
     return '''
@@ -347,7 +347,7 @@ class ${className}Cubit extends Cubit<${className}State> {
   static String cubit(String featureName, DataClassFormat format) {
     return switch (format) {
       DataClassFormat.freezed => cubitFreezed(featureName),
-      DataClassFormat.sealedUnion => cubitSealedUnion(featureName),
+      DataClassFormat.native => _cubitNative(featureName),
     };
   }
 
@@ -410,7 +410,7 @@ sealed class ${className}State with _\$${className}State {
 ''';
   }
 
-  static String _stateSealedUnion(String featureName) {
+  static String _stateNative(String featureName) {
     final className = featureName.pascalCase;
     return '''
 part of '${featureName}_notifier.dart';
@@ -430,11 +430,11 @@ class _${className}Initial implements ${className}State {
   static String state(String featureName, DataClassFormat format) {
     return switch (format) {
       DataClassFormat.freezed => _stateFreezed(featureName),
-      DataClassFormat.sealedUnion => _stateSealedUnion(featureName),
+      DataClassFormat.native => _stateNative(featureName),
     };
   }
 
-  static String notifierFreezed(String featureName) {
+  static String _notifierFreezed(String featureName) {
     final className = featureName.pascalCase;
 
     return '''
@@ -455,7 +455,7 @@ class ${className}Notifier extends _\$${className}Notifier {
 ''';
   }
 
-  static String notifierSealedUnions(String featureName) {
+  static String _notifierNative(String featureName) {
     final className = featureName.pascalCase;
 
     return '''
@@ -476,8 +476,8 @@ class ${className}Notifier extends _\$${className}Notifier {
 
   static String notifier(String featureName, DataClassFormat format) {
     return switch (format) {
-      DataClassFormat.freezed => notifierFreezed(featureName),
-      DataClassFormat.sealedUnion => notifierSealedUnions(featureName),
+      DataClassFormat.freezed => _notifierFreezed(featureName),
+      DataClassFormat.native => _notifierNative(featureName),
     };
   }
 

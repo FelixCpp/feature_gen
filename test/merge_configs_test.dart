@@ -346,7 +346,7 @@ void main() {
           featurePrefix: null,
           outputDir: null,
           stateManagement: null,
-          dataClassFormat: 'sealed_unions',
+          dataClassFormat: 'native',
           runCodeFormatter: null,
           runCodeGenerator: null,
         ),

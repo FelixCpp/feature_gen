@@ -37,7 +37,7 @@ class GenerateCommand extends Command<CliFeatureGenConfig> {
       'data-class-format',
       help: 'Which data class format to use for the presentation layer.',
       valueHelp: 'freezed',
-      allowed: {'freezed', 'sealed_unions'},
+      allowed: {'freezed', 'native'},
     );
 
     argParser.addFlag(

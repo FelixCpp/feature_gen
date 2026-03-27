@@ -11,7 +11,7 @@ enum StateManagement {
 
 enum DataClassFormat {
   freezed,
-  sealedUnion,
+  native,
 }
 
 @freezed

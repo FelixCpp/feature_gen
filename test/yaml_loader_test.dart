@@ -89,15 +89,15 @@ void main() {
       expect(config.runCodeGenerator, isNull);
     });
 
-    test('should parse data class format sealed-union', () async {
+    test('should parse data class format native', () async {
       final config = await yamlLoader.loadConfigFromSource('''
-        data-class-format: sealed_unions
+        data-class-format: native
       ''');
 
       expect(config.featurePrefix, isNull);
       expect(config.outputDir, isNull);
       expect(config.stateManagement, isNull);
-      expect(config.dataClassFormat, equals('sealed_unions'));
+      expect(config.dataClassFormat, equals('native'));
       expect(config.runCodeFormatter, isNull);
       expect(config.runCodeGenerator, isNull);
     });

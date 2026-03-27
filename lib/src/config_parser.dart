@@ -50,7 +50,7 @@ DataClassFormat _parseDataClassFormat(String? value) {
   }
 
   if (value == 'freezed') return DataClassFormat.freezed;
-  if (value == 'sealed_unions') return DataClassFormat.sealedUnion;
+  if (value == 'native') return DataClassFormat.native;
 
   throw ArgumentError.value(value);
 }

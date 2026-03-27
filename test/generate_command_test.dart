@@ -136,13 +136,13 @@ void main() {
       expect(config?.runCodeGenerator, isNull);
     });
 
-    test('should create config with data-class-format sealed_unions', () async {
+    test('should create config with data-class-format native', () async {
       final config = await runner.run([
         'generate',
         '--feature-name',
         'auth',
         '--data-class-format',
-        'sealed_unions',
+        'native',
       ]);
 
       expect(config, isNotNull);
@@ -150,7 +150,7 @@ void main() {
       expect(config?.featurePrefix, isNull);
       expect(config?.outputDir, isNull);
       expect(config?.stateManagement, isNull);
-      expect(config?.dataClassFormat, equals('sealed_unions'));
+      expect(config?.dataClassFormat, equals('native'));
       expect(config?.runCodeFormatter, isNull);
       expect(config?.runCodeGenerator, isNull);
     });

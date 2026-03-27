@@ -82,13 +82,13 @@ sealed class AuthEvent with _\$AuthEvent {
 ''')));
     });
 
-    test('Should generate bloc event using sealed_unions', () async {
+    test('Should generate bloc event using native', () async {
       await generator.generate(FeatureGenConfig(
         featureName: 'auth',
         featurePrefix: null,
         outputDirectory: '',
         stateManagement: StateManagement.bloc,
-        dataClassFormat: DataClassFormat.sealedUnion,
+        dataClassFormat: DataClassFormat.native,
         runCodeFormatter: true,
         runCodeGenerator: true,
       ));
@@ -115,13 +115,13 @@ class _OnSetup implements AuthEvent {
 ''')));
     });
 
-    test('Should generate bloc state using sealed_unions', () async {
+    test('Should generate bloc state using native', () async {
       await generator.generate(FeatureGenConfig(
         featureName: 'auth',
         featurePrefix: null,
         outputDirectory: '',
         stateManagement: StateManagement.bloc,
-        dataClassFormat: DataClassFormat.sealedUnion,
+        dataClassFormat: DataClassFormat.native,
         runCodeFormatter: true,
         runCodeGenerator: true,
       ));
@@ -186,13 +186,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 ''')));
     });
 
-    test('should generate bloc using sealed unions', () async {
+    test('should generate bloc using native data class format', () async {
       await generator.generate(FeatureGenConfig(
         featureName: 'auth',
         featurePrefix: null,
         outputDirectory: '',
         stateManagement: StateManagement.bloc,
-        dataClassFormat: DataClassFormat.sealedUnion,
+        dataClassFormat: DataClassFormat.native,
         runCodeFormatter: true,
         runCodeGenerator: true,
       ));
@@ -319,13 +319,13 @@ sealed class AuthState with _\$AuthState {
 ''')));
     });
 
-    test('Should generate cubit state using sealed_unions', () async {
+    test('Should generate cubit state using native', () async {
       await generator.generate(FeatureGenConfig(
         featureName: 'auth',
         featurePrefix: null,
         outputDirectory: '',
         stateManagement: StateManagement.cubit,
-        dataClassFormat: DataClassFormat.sealedUnion,
+        dataClassFormat: DataClassFormat.native,
         runCodeFormatter: true,
         runCodeGenerator: true,
       ));
@@ -387,13 +387,13 @@ class AuthCubit extends Cubit<AuthState> {
 ''')));
     });
 
-    test('Should generate cubit using sealed unions', () async {
+    test('Should generate cubit using native data class format', () async {
       await generator.generate(FeatureGenConfig(
         featureName: 'auth',
         featurePrefix: null,
         outputDirectory: '',
         stateManagement: StateManagement.cubit,
-        dataClassFormat: DataClassFormat.sealedUnion,
+        dataClassFormat: DataClassFormat.native,
         runCodeFormatter: true,
         runCodeGenerator: true,
       ));
@@ -519,13 +519,14 @@ class AuthNotifier extends _\$AuthNotifier {
 ''')));
     });
 
-    test('Should generate riverpod notifier using sealed unions', () async {
+    test('Should generate riverpod notifier using native data class format',
+        () async {
       await generator.generate(FeatureGenConfig(
         featureName: 'auth',
         featurePrefix: null,
         outputDirectory: '',
         stateManagement: StateManagement.riverpod,
-        dataClassFormat: DataClassFormat.sealedUnion,
+        dataClassFormat: DataClassFormat.native,
         runCodeFormatter: true,
         runCodeGenerator: true,
       ));
@@ -555,13 +556,13 @@ class AuthNotifier extends _\$AuthNotifier {
 ''')));
     });
 
-    test('Should generate riverpod state using sealed_unions', () async {
+    test('Should generate riverpod state using native', () async {
       await generator.generate(FeatureGenConfig(
         featureName: 'auth',
         featurePrefix: null,
         outputDirectory: '',
         stateManagement: StateManagement.riverpod,
-        dataClassFormat: DataClassFormat.sealedUnion,
+        dataClassFormat: DataClassFormat.native,
         runCodeFormatter: true,
         runCodeGenerator: true,
       ));
