@@ -3,11 +3,33 @@
 All notable changes to this project will be documented in this file.
 Versions follow [Semantic Versioning](https://semver.org).
 
+## [1.2.2] - 2026-03-30
+
+### Bug Fixes
+
+- Fix test cases ([`be9a963`](be9a963e1f82e4546d7af31613203f8dee8a3d67))
+- Fix external depedency ([`fe69041`](fe690416131573b06d38eb63f8a7bd2137150809))
+
+### Other
+
+- Add data class format parameter ([`0acd270`](0acd2705c2f76637608136a1ed9d7ab34eb35f72))
+- Renamed data class format from sealed_unions to native ([`2493555`](2493555eb32bfb85e2ddd276142320c64d799d40))
+- Dependency validation ([`75f0c8d`](75f0c8dd59f041715ad2adf7643ef0ab58ad1d21))
+- Readme v1 ([`395f94b`](395f94b676a08366f7b4e0930307572ae9694b40))
+- Readme v2 ([`a5a533f`](a5a533f64b7c270a14b5dab75ab36d6cc811cfa4))
+- Added output image ([`743a2ec`](743a2ec5402e6711adf07927a8633c0643d0ced6))
+- Image reference in readme ([`eaa0d58`](eaa0d584275db248d0dca706637f4576696e0f6c))
+- Prepare release 1.2.2 ([`eb33a7c`](eb33a7c0ab7dcbb87b71ad5fe42823b7618b75f6))
+
 ## [1.2.1] - 2026-03-25
 
 ### Bug Fixes
 
 - Fix changelog generation ([`93fecb5`](93fecb59cdc624c4a45a5b2d7a67a107525ac405))
+
+### Miscellaneous
+
+- Chore: update CHANGELOG.md for v1.2.1 ([`07187ac`](07187aca1960f3d91614c5d3683381341ee5add7))
 
 ### Other
 
