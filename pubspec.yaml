@@ -1,6 +1,6 @@
 name: dart_feature_gen
 description: A generate tool for features inside your flutter app.
-version: 1.2.1
+version: 1.2.2
 repository: https://github.com/FelixCpp/dart_feature_gen
 issue_tracker: https://github.com/FelixCpp/dart_feature_gen/issues
 topics:
