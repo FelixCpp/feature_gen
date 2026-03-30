@@ -94,6 +94,7 @@ Create a `dart_feature_gen.yaml` in your project root to set defaults:
 output-dir: lib/features
 feature-prefix: feat
 state-management: bloc
+data-class-format: native
 code-format: true
 code-generate: true
 ```
@@ -141,6 +142,7 @@ lib/features/auth/
 | --feature-prefix     | -p    | no       |              | Directory prefix separated by '\_'                 |
 | --output-dir         | -o    | no       | lib/features | Directory for generated feature                    |
 | --state-management   |       | no       | bloc         | State management library for presentation layer    |
+| --data-class-format  |       | no       | freezed      | Data class format library for presentation layer   |
 | --(no)-code-format   |       | no       | true         | Run code formatter after generation                |
 | --(no)-code-generate |       | no       | true         | Run code generator (build_runner) after generation |
 

@@ -1,5 +1,5 @@
 import 'package:dart_feature_gen/src/io/feature_gen_io.dart';
-import 'package:dart_feature_gen/src/utility/find_nearest_file.dart';
+import 'package:dart_feature_gen/src/project/find_nearest_file.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:test/test.dart';
 import 'package:path/path.dart' as path;
