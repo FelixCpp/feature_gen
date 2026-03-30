@@ -78,6 +78,12 @@ code-format: false
 code-generate: true
 ```
 
+## Output folder structure
+The output of a command with basic configuration might look like this:
+
+[output-folder-structure image](./images/example_cli_output.png)
+
+
 ## Additional information
 
 This library detects missing dependencies along the way and will fail when you try to generate code using freezed but haven't specified a dependency on it yet. This behavior will probably extend in the future to opt-in adding the dependency automatically.
