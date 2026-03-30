@@ -20,6 +20,7 @@ void main() {
       expect(
         packages,
         unorderedEquals({
+          ExternalDependency.flutterBloc,
           ExternalDependency.freezed,
           ExternalDependency.freezedAnnotation,
           ExternalDependency.buildRunner
@@ -42,6 +43,7 @@ void main() {
       expect(
         packages,
         unorderedEquals({
+          ExternalDependency.flutterBloc,
           ExternalDependency.freezed,
           ExternalDependency.freezedAnnotation,
         }),
@@ -61,7 +63,12 @@ void main() {
         );
 
         final packages = config.getRequiredPackages();
-        expect(packages, isEmpty);
+        expect(
+          packages,
+          unorderedEquals({
+            ExternalDependency.flutterBloc,
+          }),
+        );
       },
     );
     test(
