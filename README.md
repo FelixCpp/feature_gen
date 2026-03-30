@@ -81,7 +81,7 @@ code-generate: true
 ## Output folder structure
 The output of a command with basic configuration might look like this:
 
-[output-folder-structure image](./images/example_cli_output.png)
+![output-folder-structure image](./images/example_cli_output.png)
 
 
 ## Additional information
